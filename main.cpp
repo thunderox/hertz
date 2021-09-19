@@ -39,8 +39,21 @@ int main()
 	int osc_panel = Delirium_UI_Create_Widget(GUI, deliriumUI_Panel, 0, panelX, panelY, 64,12, "SONG", -1);
 	Delirium_UI_Widget_Set_Group_And_Member(GUI, osc_panel, "global", "");
 	
-	int widget_osc1_active = Delirium_UI_Create_Widget(GUI, deliriumUI_Switch, 0, panelX + 0.5, panelY + 1.25, 3,3, "ACTIVE", -1);
+	int widget_osc1_active = Delirium_UI_Create_Widget(GUI, deliriumUI_Switch, 0, panelX + 0.5, panelY + 1.25, 3,4, "ACTIVE", 0);
 	Delirium_UI_Widget_Set_Group_And_Member(GUI, widget_osc1_active, "global", "");
+
+	int widget_osc2_active = Delirium_UI_Create_Widget(GUI, deliriumUI_Switch, 0, panelX + 5.5, panelY + 1.25, 3,4, "ACTIVE", 0);
+	Delirium_UI_Widget_Set_Group_And_Member(GUI, widget_osc2_active, "global", "");
+
+	int widget_osc3_active = Delirium_UI_Create_Widget(GUI, deliriumUI_Switch, 0, panelX + 10.5, panelY + 1.25, 3,4, "ACTIVE", 0);
+	Delirium_UI_Widget_Set_Group_And_Member(GUI, widget_osc3_active, "global", "");
+
+	int widget_osc4_active = Delirium_UI_Create_Widget(GUI, deliriumUI_Switch, 0, panelX + 15.5, panelY + 1.25, 3,4, "ACTIVE", 0);
+	Delirium_UI_Widget_Set_Group_And_Member(GUI, widget_osc4_active, "global", "");
+        
+      	int widget_osc5_active = Delirium_UI_Create_Widget(GUI, deliriumUI_Fader, 0, panelX + 20.5, panelY + 1.25, 2,8, "ACTIVE", 0);
+	Delirium_UI_Widget_Set_Group_And_Member(GUI, widget_osc5_active, "global", "");
+        
         
 	Delirium_UI_Group_Set_Active_Widgets(GUI);
         Delirium_UI_Display_All(GUI, cr);
@@ -65,19 +78,42 @@ int main()
 	
 	while (win_ev.type != WINDOW_EVENT_TYPE_EXIT)
 	{
+
+		win_ev.type = 0;
+		
 		win_ev = window_manager.wait_for_event();
 		
-		if (win_ev.mouse_button == WINDOW_EVENT_TYPE_MOUSE_BUTTON_RELEASE)
+		//---- TIME TO REDRAW WINDOW --------------------------------------------------
+		if (win_ev.type == WINDOW_EVENT_TYPE_EXPOSE)
 		{
 			GUI->draw_flag = true;	
 			Delirium_UI_Display_All(GUI, cr);
 			cairo_surface_flush(surface);
 			xcb_flush(window_manager.c);
-			
 		}
 		
-		if (win_ev.mouse_button == 1) Delirium_UI_Left_Button_Press(GUI, cr, win_ev.x, win_ev.y);
-		if (win_ev.type == WINDOW_EVENT_TYPE_MOUSE_OVER) Delirium_UI_MouseOver(GUI, cr, win_ev.x, win_ev.y);
+		//---- MOUSE BUTTON PRESSED --------------------------------------------------
+		if (win_ev.type == WINDOW_EVENT_TYPE_MOUSE_BUTTON_PRESS)
+		{
+			if (win_ev.mouse_button == 1)
+			{
+				Delirium_UI_Left_Button_Press(GUI, cr, win_ev.x, win_ev.y);
+			}
+		}	
+		
+		//---- MOUSE BUTTON PRESSED --------------------------------------------------
+		if (win_ev.type == WINDOW_EVENT_TYPE_MOUSE_BUTTON_RELEASE)
+		{
+				Delirium_UI_Left_Button_Press(GUI, cr, win_ev.x, win_ev.y);
+		}
+			
+		//---- MOUSE MOVED OVER WINDOW --------------------------------------------------
+		if (win_ev.type == WINDOW_EVENT_TYPE_MOUSE_OVER)
+		{
+		
+			Delirium_UI_MouseOver(GUI, cr, win_ev.x, win_ev.y);
+		}
+		
 		
 		
 	}

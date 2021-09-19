@@ -119,62 +119,59 @@ window_event window::wait_for_event()
 	xcb_generic_event_t* event;
 	window_event win_ev;
 	
+	win_ev.type = WINDOW_EVENT_TYPE_NONE;
+	win_ev.x = -1;
+	win_ev.y = -1;
+	win_ev.mouse_button = 0;
+
 	while(event = xcb_poll_for_event(c) )
 	{
-
 		switch (event->response_type)
 		{
 			// Expose event
 			case XCB_EXPOSE:
-			win_ev.type = WINDOW_EVENT_TYPE_NONE;
-			win_ev.x = -1;
-			win_ev.y = -1;
-			win_ev.mouse_button = 0;
-			return win_ev;
-			break;
+				win_ev.type = WINDOW_EVENT_TYPE_EXPOSE;
+				return win_ev;
+				break;
 			
 			// Respond if the event is a key press
 			case XCB_KEY_PRESS:
-			win_ev.type = WINDOW_EVENT_TYPE_KEY_PRESS;
-			break;
+				win_ev.type = WINDOW_EVENT_TYPE_KEY_PRESS;
+				return win_ev;
+				break;
   
 			// Respond if the event is a mouse click
 			case XCB_BUTTON_PRESS:
-			xcb_button_press_event_t *button_ev;
-			button_ev = (xcb_button_press_event_t *)event;
-
-			win_ev.type = WINDOW_EVENT_TYPE_MOUSE_BUTTON_PRESS;
-			win_ev.mouse_button = (int)button_ev->detail;
-			win_ev.x = button_ev->event_x;
-			win_ev.y = button_ev->event_y;
-			return win_ev;
-			break;
+				win_ev.type = WINDOW_EVENT_TYPE_MOUSE_BUTTON_PRESS;
+				xcb_button_press_event_t *button_ev;
+				button_ev = (xcb_button_press_event_t *)event;
+				win_ev.mouse_button = (int)button_ev->detail;
+				win_ev.x = button_ev->event_x;
+				win_ev.y = button_ev->event_y;			
+				return win_ev;
+				break;
 			
 			// Respond if the event is a mouse click released
 			case XCB_BUTTON_RELEASE:
-			
-			win_ev.type = WINDOW_EVENT_TYPE_MOUSE_BUTTON_RELEASE;
-			break;
+				win_ev.type = WINDOW_EVENT_TYPE_MOUSE_BUTTON_RELEASE;
+				xcb_button_press_event_t *release_button_ev;
+				release_button_ev = (xcb_button_press_event_t *)event;
+				win_ev.type = WINDOW_EVENT_TYPE_MOUSE_BUTTON_PRESS;
+				win_ev.mouse_button = (int)release_button_ev->detail;
+				win_ev.x = release_button_ev->event_x;
+				win_ev.y = release_button_ev->event_y;
+				return win_ev;
+				break;
 			
 			// Respond if the event is a mouse click
 			case XCB_MOTION_NOTIFY:
-			xcb_motion_notify_event_t *motion_ev;
-			motion_ev = (xcb_motion_notify_event_t *)event;
-			
-			win_ev.type = WINDOW_EVENT_TYPE_MOUSE_OVER;
-			win_ev.x = motion_ev->event_x;
-			win_ev.y = motion_ev->event_y;
-			break;
-	  
-			// Respond if the event is something else
-			default:
-			cout << event << endl;
-			win_ev.type = WINDOW_EVENT_TYPE_NONE;
-			win_ev.x = -1;
-			win_ev.y = -1;
-			win_ev.mouse_button = 0;
-			return win_ev;
-			break;
+				xcb_motion_notify_event_t *motion_ev;
+				motion_ev = (xcb_motion_notify_event_t *)event;		
+				win_ev.type = WINDOW_EVENT_TYPE_MOUSE_OVER;
+				win_ev.x = motion_ev->event_x;
+				win_ev.y = motion_ev->event_y;
+				return win_ev;
+				break;
 		}	
 	}
 

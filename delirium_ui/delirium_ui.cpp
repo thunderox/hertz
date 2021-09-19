@@ -257,10 +257,6 @@ void Delirium_UI_Widget_Set_Min_Max(Delirium_UI_Surface* GUI, int widget_number,
 
 void Delirium_UI_Display_All(Delirium_UI_Surface* GUI, cairo_t* cr)
 {
-	
-	if (GUI->drawn_at_least_once < 3) GUI->draw_flag = true;
-
-
 	if (GUI->draw_flag)
 	{
 		GUI->draw_flag = false;
@@ -274,7 +270,9 @@ void Delirium_UI_Display_All(Delirium_UI_Surface* GUI, cairo_t* cr)
 			bool widget_visible = GUI->Widgets[x]->active;
 			
 			if (widget_visible)		
+			{
 				GUI->Widgets[x]->Draw(cr);
+			}
 		}
 		
 		GUI->drawn_at_least_once++;
@@ -303,15 +301,13 @@ void Delirium_UI_Display_All(Delirium_UI_Surface* GUI, cairo_t* cr)
 void Delirium_UI_MouseOver(Delirium_UI_Surface* GUI, cairo_t* cr, int mx,int my)
 {
 	
-		cout << "mooooooooooooo" << endl;
 	if (GUI->drag == 0)
 	{
 		Delirium_UI_Mouse_Over(GUI,mx,my);
 
 		int old_current_widget = GUI->current_widget;
 		GUI->current_widget = -1;
-		
-		
+				
 		for (uint x=0; x<GUI->Widgets.size(); x++)
 		{		
 			Rectangle r_widget;
@@ -320,7 +316,6 @@ void Delirium_UI_MouseOver(Delirium_UI_Surface* GUI, cairo_t* cr, int mx,int my)
 			r_widget.setY(GUI->Widgets[x]->y_position * GUI->y_grid_size);
 			r_widget.setWidth(GUI->Widgets[x]->width * GUI->x_grid_size);
 			r_widget.setHeight(GUI->Widgets[x]->height * GUI->y_grid_size);
-
 			
 			if (r_widget.contains(mx,my))
 			{
@@ -357,6 +352,11 @@ void Delirium_UI_MouseOver(Delirium_UI_Surface* GUI, cairo_t* cr, int mx,int my)
 				Delirium_UI_Left_Button_Press(GUI,cr,-1,my);
 		}
 	}	
+	
+		
+	
+	// cout << "Mouse Over - " << mx << " - " << my << " - " << GUI->current_widget << endl;
+		
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -384,7 +384,8 @@ void Delirium_UI_Left_Button_Press(Delirium_UI_Surface* GUI, cairo_t* cr, int xm
 	}
 	
 
-	if (xm > -1 && GUI->Widgets[current_widget]->type != deliriumUI_Tabbed_Navigator) GUI->drag = 1 - GUI->drag;
+	// if (xm > -1 && GUI->Widgets[current_widget]->type != deliriumUI_Tabbed_Navigator) GUI->drag = 1 - GUI->drag;
+	
 	
 	if (current_widget > -1)
 	{
@@ -401,6 +402,8 @@ void Delirium_UI_Left_Button_Press(Delirium_UI_Surface* GUI, cairo_t* cr, int xm
 			GUI->Widgets[current_widget]->Draw(cr);
 		}
 	}
+	
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------

@@ -71,9 +71,9 @@ void Delirium_UI_Widget_Switch::Draw(cairo_t* cr)
 		cairo_pattern_destroy(grad_led);
 
 		if (hover) {
-			cairo_set_source_rgba(cr, 1, 1, 1, 1);
+			cairo_set_source_rgb(cr, 1, 1, 1);
 		} else {
-			cairo_set_source_rgba(cr, 1, 1, 1, 0.6);
+			cairo_set_source_rgb(cr, 0.5,0.5,0.5);
 
 		}
 	}
@@ -123,9 +123,9 @@ void Delirium_UI_Widget_Switch::Draw(cairo_t* cr)
 		cairo_pattern_destroy(grad_led);
 
 		if (hover) {
-			cairo_set_source_rgba(cr, 1, 1, 1, 1);
+			cairo_set_source_rgb(cr, 1, 1, 1);
 		} else {
-			cairo_set_source_rgba(cr, 1, 1, 1, 0.6);
+			cairo_set_source_rgb(cr, 0.5,0.5,0.5);
 
 		}		
 	}
