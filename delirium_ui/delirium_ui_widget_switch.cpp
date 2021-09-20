@@ -1,7 +1,7 @@
 
 #include "delirium_ui.hpp"
 #include <sstream>
-#include<bits/stdc++.h> 
+#include <bits/stdc++.h> 
 
 //-------------------------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ void Delirium_UI_Widget_Switch::Draw(cairo_t* cr)
 
 	cairo_set_source(cr, theme_background_grad);
 				
-	cairo_rectangle(cr, wX - font_size, wY - font_size, wW + (font_size * 1.5), wH + font_size);
+	cairo_rectangle(cr, wX - font_size, wY - font_size, wW + (font_size * 1.5), wH + (font_size));
 	cairo_fill(cr);
 
 	float value = normalised_values[0];
@@ -130,7 +130,9 @@ void Delirium_UI_Widget_Switch::Draw(cairo_t* cr)
 		}		
 	}
 
-
+	if (hover) cairo_set_source_rgb(cr, 1, 1, 1);
+		else cairo_set_source_rgb(cr, 0.5,0.5,0.5);
+		
 	cairo_move_to(cr,x_text_centred, wY + font_size);
 	cairo_show_text(cr, txt.c_str());
 	

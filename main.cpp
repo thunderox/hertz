@@ -33,7 +33,6 @@ int main()
 	GUI->group_visible[0] = true;
 	GUI->draw_flag = true;					
 	GUI->drag = 0;
-	GUI->drawn_at_least_once = 1;
 	GUI->current_widget = -1;
 
 	int osc_panel = Delirium_UI_Create_Widget(GUI, deliriumUI_Panel, 0, panelX, panelY, 64,12, "SONG", -1);
@@ -53,6 +52,12 @@ int main()
         
       	int widget_osc5_active = Delirium_UI_Create_Widget(GUI, deliriumUI_Fader, 0, panelX + 20.5, panelY + 1.25, 2,8, "ACTIVE", 0);
 	Delirium_UI_Widget_Set_Group_And_Member(GUI, widget_osc5_active, "global", "");
+	
+	int widget_osc6_active = Delirium_UI_Create_Widget(GUI, deliriumUI_Label, 0, panelX + 28.5, panelY + 1.25, 10,2, "ACTIVE", 0);
+	Delirium_UI_Widget_Set_Group_And_Member(GUI, widget_osc6_active, "global", "");
+	
+	int widget_osc7_active = Delirium_UI_Create_Widget(GUI, deliriumUI_Fader, 0, panelX + 40.5, panelY + 1.25, 2,8, "ACTIVE", 0);
+	Delirium_UI_Widget_Set_Group_And_Member(GUI, widget_osc7_active, "global", "");
         
         
 	Delirium_UI_Group_Set_Active_Widgets(GUI);
@@ -98,13 +103,16 @@ int main()
 			if (win_ev.mouse_button == 1)
 			{
 				Delirium_UI_Left_Button_Press(GUI, cr, win_ev.x, win_ev.y);
+				GUI->drag = true;
+				xcb_flush(window_manager.c);
 			}
 		}	
 		
 		//---- MOUSE BUTTON PRESSED --------------------------------------------------
 		if (win_ev.type == WINDOW_EVENT_TYPE_MOUSE_BUTTON_RELEASE)
 		{
-				Delirium_UI_Left_Button_Press(GUI, cr, win_ev.x, win_ev.y);
+			GUI->drag = false;
+			//xcb_flush(window_manager.c);
 		}
 			
 		//---- MOUSE MOVED OVER WINDOW --------------------------------------------------
@@ -112,6 +120,7 @@ int main()
 		{
 		
 			Delirium_UI_MouseOver(GUI, cr, win_ev.x, win_ev.y);
+			xcb_flush(window_manager.c);
 		}
 		
 		

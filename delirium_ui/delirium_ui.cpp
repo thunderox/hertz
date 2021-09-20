@@ -19,7 +19,6 @@ Delirium_UI_Surface* Delirium_UI_Init(int width, int height, int gridX, int grid
 
 	GUI->current_widget = -1;
 	GUI->draw_flag = true;
-	GUI->drawn_at_least_once = false;
 	
 	group new_group;
 	new_group.name = "global";
@@ -319,25 +318,25 @@ void Delirium_UI_MouseOver(Delirium_UI_Surface* GUI, cairo_t* cr, int mx,int my)
 			
 			if (r_widget.contains(mx,my))
 			{
- 
-				if (old_current_widget > -1)
-				{
-					bool widget_visible = GUI->Widgets[x]->active;
-					
-					if (widget_visible)
-					{
-						GUI->Widgets[old_current_widget]->hover = false; // New current widget switch hover off previous
-						if (GUI->Widgets[old_current_widget]->type != deliriumUI_Panel) GUI->Widgets[old_current_widget]->Draw(cr); // one and redraw it.
-					}
-				}
-
 				bool widget_visible = GUI->Widgets[x]->active;
-				
-				if (widget_visible)
+									
+				if (widget_visible && GUI->Widgets[x]->type != deliriumUI_Panel)
 				{
 					GUI->current_widget = x;
 					GUI->Widgets[x]->hover = true;
-					if (GUI->Widgets[x]->type != deliriumUI_Panel) GUI->Widgets[x]->Draw(cr);
+					if (GUI->Widgets[x]->type != deliriumUI_Panel)
+					{
+						GUI->Widgets[x]->Draw(cr);
+					}
+
+				}
+			}
+			else
+			{
+				if (GUI->Widgets[x]->hover == true)
+				{
+					GUI->Widgets[old_current_widget]->hover = false; // New current widget switch hover off previous
+					GUI->Widgets[old_current_widget]->Draw(cr); // one and redraw it.
 				}
 			}
 		}
@@ -353,10 +352,6 @@ void Delirium_UI_MouseOver(Delirium_UI_Surface* GUI, cairo_t* cr, int mx,int my)
 		}
 	}	
 	
-		
-	
-	// cout << "Mouse Over - " << mx << " - " << my << " - " << GUI->current_widget << endl;
-		
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------
@@ -366,11 +361,9 @@ void Delirium_UI_Left_Button_Press(Delirium_UI_Surface* GUI, cairo_t* cr, int xm
 {
 
 	int current_widget = GUI->current_widget;
-	
-	if (current_widget < 0 || GUI->Widgets[current_widget]->type == deliriumUI_Panel) return;
+	if (current_widget < 0) return;
 	
 	bool widget_visible = GUI->Widgets[current_widget]->active;
-
 	if (!widget_visible) return;
 	
 	if (GUI->Widgets[current_widget]->type == deliriumUI_Tabbed_Navigator) // This is a navigation widget see which group it applies to
@@ -383,24 +376,13 @@ void Delirium_UI_Left_Button_Press(Delirium_UI_Surface* GUI, cairo_t* cr, int xm
 		
 	}
 	
-
-	// if (xm > -1 && GUI->Widgets[current_widget]->type != deliriumUI_Tabbed_Navigator) GUI->drag = 1 - GUI->drag;
-	
-	
 	if (current_widget > -1)
 	{
-		GUI->Widgets[current_widget]->pressed = 1 - GUI->Widgets[current_widget]->pressed;
+		GUI->Widgets[current_widget]->pressed = true;
 		GUI->Widgets[current_widget]->Left_Button_Press(xm,ym);
 		Delirium_UI_Convert_Value_To_Range(GUI,current_widget);
-
-		if (GUI->drag==0)
-		{
-			GUI->draw_flag = true;
-			GUI->Widgets[current_widget]->hover = false;	
-			GUI->Widgets[current_widget]->press_count = 0;
-			GUI->current_widget = -1;
-			GUI->Widgets[current_widget]->Draw(cr);
-		}
+		GUI->Widgets[current_widget]->Draw(cr);
+		
 	}
 	
 

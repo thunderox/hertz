@@ -124,7 +124,7 @@ window_event window::wait_for_event()
 	win_ev.y = -1;
 	win_ev.mouse_button = 0;
 
-	while(event = xcb_poll_for_event(c) )
+	while(event = xcb_wait_for_event(c) )
 	{
 		switch (event->response_type)
 		{
@@ -156,7 +156,6 @@ window_event window::wait_for_event()
 				win_ev.type = WINDOW_EVENT_TYPE_MOUSE_BUTTON_RELEASE;
 				xcb_button_press_event_t *release_button_ev;
 				release_button_ev = (xcb_button_press_event_t *)event;
-				win_ev.type = WINDOW_EVENT_TYPE_MOUSE_BUTTON_PRESS;
 				win_ev.mouse_button = (int)release_button_ev->detail;
 				win_ev.x = release_button_ev->event_x;
 				win_ev.y = release_button_ev->event_y;
