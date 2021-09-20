@@ -11,8 +11,8 @@ void Delirium_UI_Widget_Label::Draw(cairo_t* cr)
 	float widget_width = width * x_grid_size;
 	float widget_height = height * y_grid_size;
 
-	if (hover) {cairo_set_source_rgba(cr, 0.25,0,0,0.25); }
-		else {cairo_set_source_rgba(cr, 0,0,0,0.5); }
+	if (hover) {cairo_set_source_rgb(cr, 0.25,0,0); }
+		else {cairo_set_source_rgb(cr, 0.15,0,0); }
 
 	cairo_rectangle(cr, widget_x_position,widget_y_position,widget_width,widget_height);
 	cairo_fill(cr);

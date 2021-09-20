@@ -26,9 +26,9 @@ Delirium_UI_Surface* Delirium_UI_Init(int width, int height, int gridX, int grid
 	GUI->groups.push_back(new_group);
 	
 	GUI->theme_background_grad = cairo_pattern_create_linear (0,0,0,height);
-	cairo_pattern_add_color_stop_rgb(GUI->theme_background_grad, 0, 0.17,0.0,0.0);
-	cairo_pattern_add_color_stop_rgb(GUI->theme_background_grad, 0.5, 0.3,0.0,0.0);
-	cairo_pattern_add_color_stop_rgb(GUI->theme_background_grad, 1.0, 0.2,0.0,0.0);
+	cairo_pattern_add_color_stop_rgb(GUI->theme_background_grad, 0, 0.15,0.15,0.15);
+	cairo_pattern_add_color_stop_rgb(GUI->theme_background_grad, 0.5, 0.15,0.15,0.15);
+	cairo_pattern_add_color_stop_rgb(GUI->theme_background_grad, 1.0, 0.15,0.15,0.15);
 		
 	GUI->logo_surface = cairo_image_surface_create_from_png ("/usr/lib/lv2/thunderox_triceratops.lv2/logo.png");
 	
