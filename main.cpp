@@ -58,6 +58,9 @@ int main()
 	
 	int widget_osc7_active = Delirium_UI_Create_Widget(GUI, deliriumUI_Fader, 0, panelX + 40.5, panelY + 1.25, 2,8, "ACTIVE", 0);
 	Delirium_UI_Widget_Set_Group_And_Member(GUI, widget_osc7_active, "global", "");
+
+	int widget_osc8_active = Delirium_UI_Create_Widget(GUI, deliriumUI_Knob, 0, panelX + 50.5, panelY + 1.25, 4,4, "ACTIVE", 0);
+	Delirium_UI_Widget_Set_Group_And_Member(GUI, widget_osc8_active, "global", "");
         
         
 	Delirium_UI_Group_Set_Active_Widgets(GUI);
@@ -100,12 +103,25 @@ int main()
 		//---- MOUSE BUTTON PRESSED --------------------------------------------------
 		if (win_ev.type == WINDOW_EVENT_TYPE_MOUSE_BUTTON_PRESS)
 		{
-			if (win_ev.mouse_button == 1)
+			if (win_ev.mouse_button == 1) // Mouse 
 			{
 				Delirium_UI_Left_Button_Press(GUI, cr, win_ev.x, win_ev.y);
 				GUI->drag = true;
 				xcb_flush(window_manager.c);
 			}
+			
+			if (win_ev.mouse_button >= 4 && win_ev.mouse_button <= 5) // Mouse Scroll Wheel detected
+			{
+				int delta = (win_ev.mouse_button==4) - (win_ev.mouse_button==5);
+				int current_widget = GUI->current_widget;
+				if (current_widget > -1)
+				{
+					GUI->Widgets[current_widget]->Mouse_Scroll(0,0,delta);
+					GUI->Widgets[current_widget]->Draw(cr);
+					xcb_flush(window_manager.c);
+				}
+			}
+			
 		}	
 		
 		//---- MOUSE BUTTON PRESSED --------------------------------------------------
