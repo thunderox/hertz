@@ -75,11 +75,16 @@ int main()
 	cout << my_song.get_name() << endl;
 		
 	jack_manager my_jack_manager;
+	my_jack_manager.set_current_manager(&my_jack_manager);
 
 	my_jack_manager.create_client("piggy");
 	my_jack_manager.create_jack_out("piggy","track-1");
 		
 	my_jack_manager.connect_audio("piggy", "");
+	
+	song new_song;
+	new_song.sample_rate = my_jack_manager.sample_rate;
+	cout << new_song.tempo << " - " << new_song.ppqn << " - " << new_song.sample_rate << endl;
 
 	window_event win_ev;
 	win_ev.type = WINDOW_EVENT_TYPE_NONE;

@@ -1,6 +1,8 @@
 
 #include "jack_manager.h"
 
+jack_manager* _jackmanager;
+
 //--------------------------------------------------------------------------------------------------
 // CONSTRUCTOR
 
@@ -13,6 +15,13 @@ jack_manager::jack_manager()
 
 jack_manager::~jack_manager()
 {
+}
+
+//--------------------------------------------------------------------------------------------------
+// SET CURRENT JACK MANAGER
+void jack_manager::set_current_manager(jack_manager* current_jack_manager)
+{
+	_jackmanager = current_jack_manager;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -155,6 +164,35 @@ int jack_manager::get_client_number(string name)
 
 int process(jack_nframes_t nframes, void *arg)
 {
+
+	jack_port_t *input_port;	
+
+	vector <void*> port_buffers;
+
+	vector <jack_default_audio_sample_t*> audio_buffers_left;
+	vector <jack_default_audio_sample_t*> audio_buffers_right;
+
+	for (int port=0; port<_jackmanager->jack_outs.size(); ++port)
+	{
+		void* port_buf = jack_port_get_buffer(_jackmanager->jack_outs[port].output_port, nframes);
+		jack_midi_clear_buffer(port_buf);
+		port_buffers.push_back(port_buf);	
+			
+		jack_default_audio_sample_t* audio_buf_left = (jack_default_audio_sample_t*)
+			jack_port_get_buffer(_jackmanager->jack_outs[port].audio_out_left, nframes);
+
+		jack_default_audio_sample_t* audio_buf_right = (jack_default_audio_sample_t*)
+			jack_port_get_buffer(_jackmanager->jack_outs[port].audio_out_right, nframes);
+
+		memset( audio_buf_left, 0, sizeof(double)*(nframes*0.5) );
+		memset( audio_buf_right, 0, sizeof(double)*(nframes*0.5) );
+
+		audio_buffers_left.push_back(audio_buf_left);
+		audio_buffers_right.push_back(audio_buf_right);
+
+
+	}
+
 	return 0;
 }
 
@@ -164,7 +202,7 @@ int process(jack_nframes_t nframes, void *arg)
 int cb_srate (jack_nframes_t _sample_rate, void *arg)
 {
 	cout << "Sample rate changed to " << _sample_rate << endl;
-	//_jackmanager->sample_rate = _sample_rate;
+	_jackmanager->sample_rate = _sample_rate;
 	
 	return 0;
 }

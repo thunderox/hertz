@@ -3,6 +3,8 @@
 #include <jack/jack.h>
 #include <jack/midiport.h>
 #include <iostream>
+#include <stdio.h>
+#include <cstring>
 #include <string>
 #include <sstream>
 #include <vector> 
@@ -43,18 +45,22 @@ class jack_manager
 	
 		jack_manager();
 		~jack_manager();
+		void set_current_manager(jack_manager*);
 		
 		bool create_client(string);
 		void close_client(string);
 		int create_jack_out(string,string);
 		int get_client_number(string);
 		void connect_audio(string, string);
-	
-	private:
-	
+		int sample_rate;
+		
 		vector<jack_out> jack_outs;
 		vector<jack_in> jack_ins;
 		vector<jack_client> jack_clients;
+	
+	private:
+	
+
 
 };
 
