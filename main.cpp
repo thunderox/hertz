@@ -30,6 +30,9 @@ int main()
  	float panelX = 0.5;
 	float panelY = 0.5;
 	
+	
+	
+	
 	GUI->group_visible[0] = true;
 	GUI->draw_flag = true;					
 	GUI->drag = 0;
@@ -73,6 +76,9 @@ int main()
 	my_song.set_name("This is my first ever song");
 
 	cout << my_song.get_name() << endl;
+	
+	
+	my_song.load_midi_file("test.mid");
 		
 	jack_manager my_jack_manager;
 	my_jack_manager.set_current_manager(&my_jack_manager);
