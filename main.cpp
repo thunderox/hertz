@@ -78,7 +78,7 @@ int main()
 	cout << my_song.get_name() << endl;
 	
 	
-	my_song.load_midi_file("test.mid");
+	my_song.load_midi_file("test2.mid");
 		
 	jack_manager my_jack_manager;
 	my_jack_manager.set_current_manager(&my_jack_manager);

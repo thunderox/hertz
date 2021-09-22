@@ -30,8 +30,8 @@ typedef struct
 //-----------------------------------------------------------------------
 typedef struct
 {
+	string name;
 	float volume;
-	vector <tempo_event> tempo_events;
 } track;
 
 //-----------------------------------------------------------------------
@@ -60,6 +60,7 @@ class song
 	public:
 	song();
 	~song();
+	int create_track(string);
 	bool load_midi_file(string);
 	
 	void set_name(string);
@@ -69,6 +70,7 @@ class song
 	int ppqn;
 	int tempo;
 	
+	vector <track> tracks;
 
 	
 	enum EventName : uint8_t

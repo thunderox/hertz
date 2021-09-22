@@ -187,6 +187,7 @@ bool song::load_midi_file(string file_name)
 				uint8_t nChannel = nStatus & 0x0F;
 				uint8_t nNoteID = ifs.get();
 				uint8_t nNoteVelocity = ifs.get();
+				cout << (int)nNoteID << endl;
 				if(nNoteVelocity == 0)
 					vecTracks[nChunk].vecEvents.push_back({ MidiEvent::Type::NoteOff, nNoteID, nNoteVelocity, nStatusTimeDelta });
 				else
@@ -258,7 +259,8 @@ bool song::load_midi_file(string file_name)
 						break;
 					case MetaTrackName:
 						vecTracks[nChunk].sName = ReadString(nLength);
-						std::cout << "Track Name: " << vecTracks[nChunk].sName << std::endl;							
+						std::cout << "Track Name: " << vecTracks[nChunk].sName << std::endl;	
+						create_track(vecTracks[nChunk].sName);				
 						break;
 					case MetaInstrumentName:
 						vecTracks[nChunk].sInstrument = ReadString(nLength);
@@ -372,7 +374,13 @@ bool song::load_midi_file(string file_name)
 
 
 
+//---------------------------------------------------------------------------------------
+// CREATE NEW TRACK
 
-
-
-
+int song::create_track(string name)
+{
+	track new_track;
+	new_track.name = name;
+	tracks.push_back(new_track);
+	return tracks.size()-1;
+}
