@@ -116,6 +116,9 @@ bool song::load_midi_file(string file_name)
 	ifs.read((char*)&n16, sizeof(uint16_t));
 	uint16_t nDivision = Swap16(n16);
 	
+	int current_block = -1;
+	int current_track = -1;
+	
 	for (uint16_t nChunk = 0; nChunk < nTrackChunks; nChunk++)
 	{			
 		std::cout << "===== NEW TRACK" << std::endl;
@@ -187,11 +190,26 @@ bool song::load_midi_file(string file_name)
 				uint8_t nChannel = nStatus & 0x0F;
 				uint8_t nNoteID = ifs.get();
 				uint8_t nNoteVelocity = ifs.get();
-				cout << (int)nNoteID << endl;
 				if(nNoteVelocity == 0)
+				{
 					vecTracks[nChunk].vecEvents.push_back({ MidiEvent::Type::NoteOff, nNoteID, nNoteVelocity, nStatusTimeDelta });
+					block_event new_block_event;
+					new_block_event.event_type = block_event_type_note_off;
+					new_block_event.note = nNoteID;
+					new_block_event.volume =  nNoteVelocity;
+					new_block_event.delta = nStatusTimeDelta;
+					blocks[current_block].events.push_back(new_block_event);
+				}
 				else
+				{
 					vecTracks[nChunk].vecEvents.push_back({ MidiEvent::Type::NoteOn, nNoteID, nNoteVelocity, nStatusTimeDelta });
+					block_event new_block_event;
+					new_block_event.event_type = block_event_type_note_on;
+					new_block_event.note = nNoteID;
+					new_block_event.volume =  nNoteVelocity;
+					new_block_event.delta = nStatusTimeDelta;
+					blocks[current_block].events.push_back(new_block_event);
+				}
 			}
 
 			else if ((nStatus & 0xF0) == EventName::VoiceAftertouch)
@@ -260,7 +278,8 @@ bool song::load_midi_file(string file_name)
 					case MetaTrackName:
 						vecTracks[nChunk].sName = ReadString(nLength);
 						std::cout << "Track Name: " << vecTracks[nChunk].sName << std::endl;	
-						create_track(vecTracks[nChunk].sName);				
+						current_track = create_track(vecTracks[nChunk].sName);
+						current_block = create_block(vecTracks[nChunk].sName,0,8192);
 						break;
 					case MetaInstrumentName:
 						vecTracks[nChunk].sInstrument = ReadString(nLength);
@@ -289,6 +308,7 @@ bool song::load_midi_file(string file_name)
 							(m_nTempo |= (ifs.get() << 8));
 							(m_nTempo |= (ifs.get() << 0));
 							m_nBPM = (60000000 / m_nTempo);
+							tempo = m_nBPM;
 							std::cout << "Tempo: " << m_nTempo << " (" << m_nBPM << "bpm)" << std::endl;
 						}
 						break;
@@ -382,5 +402,24 @@ int song::create_track(string name)
 	track new_track;
 	new_track.name = name;
 	tracks.push_back(new_track);
+	
 	return tracks.size()-1;
 }
+
+
+//---------------------------------------------------------------------------------------
+// CREATE NEW BLOCK
+int song::create_block(string name,long start, long length)
+{
+	block new_block;
+	new_block.name = name;
+	new_block.volume = 0.75;
+	new_block.start = start;
+	new_block.length = length;
+	blocks.push_back(new_block);
+	return blocks.size()-1;
+}
+
+
+
+

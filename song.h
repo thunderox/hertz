@@ -34,12 +34,15 @@ typedef struct
 	float volume;
 } track;
 
+const int block_event_type_note_on = 1;
+const int block_event_type_note_off = 2;
+
 //-----------------------------------------------------------------------
 typedef struct
 {
 	int event_type;
-	int midi_note;
-	int midi_volume;
+	int note;
+	int volume;
 	long delta;
 	
 } block_event;
@@ -47,10 +50,11 @@ typedef struct
 //-----------------------------------------------------------------------
 typedef struct
 {
+	string name;
 	float volume;
-	float start;
-	float length;
-	vector <block_event> block_events;
+	long start;
+	long length;
+	vector <block_event> events;
 } block;
 
 //-------------------------------------------------------------------------------
@@ -61,6 +65,7 @@ class song
 	song();
 	~song();
 	int create_track(string);
+	int create_block(string,long,long);
 	bool load_midi_file(string);
 	
 	void set_name(string);
@@ -71,6 +76,7 @@ class song
 	int tempo;
 	
 	vector <track> tracks;
+	vector <block> blocks;
 
 	
 	enum EventName : uint8_t
