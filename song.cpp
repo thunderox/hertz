@@ -421,5 +421,29 @@ int song::create_block(string name,long start, long length)
 }
 
 
+//----------------------------------------------------------------------------------------
+// DRAW TRACK DISPLAY
+
+void song::draw_track_display(cairo_t* cr)
+{
+	cairo_set_source_rgb(cr, 0.4,0.4,0.4);
+	cairo_rectangle(cr, 24,240,window_width-48,600);
+	cairo_fill(cr);
+	
+	int by = 2;
+	int bh = 64;
+	
+	for (int x=0; x<tracks.size(); x++)
+	{
+		cairo_set_source_rgb(cr, 0.2,0.2,0.2);
+		cairo_rectangle(cr, 24,240+by,window_width-48,bh);
+		cairo_fill(cr);
+		by += (bh + 2);
+	}
+}
+
+
+
+
 
 

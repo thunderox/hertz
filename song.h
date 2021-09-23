@@ -6,6 +6,7 @@
 #include <vector>
 #include <list>
 #include <algorithm>
+#include <cairo/cairo.h>
 
 using namespace std;
 
@@ -68,6 +69,8 @@ class song
 	int create_block(string,long,long);
 	bool load_midi_file(string);
 	
+	void draw_track_display(cairo_t*);
+	
 	void set_name(string);
 	string get_name();
 	
@@ -77,6 +80,9 @@ class song
 	
 	vector <track> tracks;
 	vector <block> blocks;
+	
+	int window_width;
+	int window_height;
 
 	
 	enum EventName : uint8_t

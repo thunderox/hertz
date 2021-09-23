@@ -83,6 +83,8 @@ class Delirium_UI_Widget_Base
 	float y_grid_size;
 	float gui_width;
 	float gui_height;
+	
+	bool redraw;
 
 	bool pressed;
 	bool hover;

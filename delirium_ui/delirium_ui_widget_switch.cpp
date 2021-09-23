@@ -147,7 +147,11 @@ void Delirium_UI_Widget_Switch::Draw(cairo_t* cr)
 
 void Delirium_UI_Widget_Switch::Left_Button_Press(int xm, int ym)
 {
+	float old_normalised_values = normalised_values[0];
 	if (pressed) normalised_values[0] = 1 - normalised_values[0];
+	
+	if (old_normalised_values != normalised_values[0]) redraw = true;
+		else redraw = false;
 }
 
 

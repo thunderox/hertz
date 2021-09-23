@@ -303,9 +303,8 @@ void Delirium_UI_MouseOver(Delirium_UI_Surface* GUI, cairo_t* cr, int mx,int my)
 	if (GUI->drag == 0)
 	{
 		Delirium_UI_Mouse_Over(GUI,mx,my);
-
-		int old_current_widget = GUI->current_widget;
-		GUI->current_widget = -1;
+				
+		int widget_mouse_over = -1;
 				
 		for (uint x=0; x<GUI->Widgets.size(); x++)
 		{		
@@ -322,23 +321,30 @@ void Delirium_UI_MouseOver(Delirium_UI_Surface* GUI, cairo_t* cr, int mx,int my)
 									
 				if (widget_visible && GUI->Widgets[x]->type != deliriumUI_Panel)
 				{
-					GUI->current_widget = x;
-					GUI->Widgets[x]->hover = true;
-					if (GUI->Widgets[x]->type != deliriumUI_Panel)
-					{
-						GUI->Widgets[x]->Draw(cr);
-					}
+					widget_mouse_over = x;
 
 				}
 			}
-			else
+			else if (GUI->Widgets[x]->hover)
 			{
-				if (GUI->Widgets[x]->hover == true)
-				{
-					GUI->Widgets[old_current_widget]->hover = false; // New current widget switch hover off previous
-					GUI->Widgets[old_current_widget]->Draw(cr); // one and redraw it.
-				}
+				if (x == GUI->current_widget) GUI->current_widget = -1;
+				GUI->Widgets[x]->hover = false;
+				GUI->Widgets[x]->Draw(cr);
 			}
+			
+		}
+		
+		if (widget_mouse_over!=-1 && widget_mouse_over!=GUI->current_widget) // Mouse is over a different widget
+		{
+			if (GUI->current_widget>-1)
+			{
+				GUI->Widgets[GUI->current_widget]->hover = false;
+				GUI->Widgets[GUI->current_widget]->Draw(cr);
+			}
+			GUI->current_widget = widget_mouse_over;
+			GUI->Widgets[widget_mouse_over]->hover = true; // New current widget switch hover on hover
+			GUI->Widgets[widget_mouse_over]->Draw(cr); // and redraw it.
+			
 		}
 	}
 

@@ -8,6 +8,9 @@
 
 void Delirium_UI_Widget_Knob::Draw(cairo_t* cr)
 {
+
+	if (!redraw) return;
+
 	if (integer) values[current_value] = int(values[current_value]);
 	Convert_Scaled_To_Value();
 
@@ -105,6 +108,7 @@ void Delirium_UI_Widget_Knob::Draw(cairo_t* cr)
 	x_text_centred = (wX + wW / 2) - extents.width / 2;
 	cairo_move_to(cr,x_text_centred, wY + font_size);
 	cairo_show_text(cr, label.c_str());
+
 }
 
 //-------------------------------------------------------------------------------------------
@@ -123,7 +127,12 @@ void Delirium_UI_Widget_Knob::Left_Button_Press(int xm, int ym)
 	float value = (float)ypixel/ (Knob_height);
 	if (value < 0) value = 0;
 	if (value > 1) value = 1;
+	float old_normalised_values = normalised_values[0];
 	normalised_values[0] = value;
+	
+	if (old_normalised_values != value) redraw = true;
+		else redraw = false;
+
 }
 
 //-------------------------------------------------------------------------------------------

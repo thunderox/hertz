@@ -8,6 +8,8 @@
 
 void Delirium_UI_Widget_Fader::Draw(cairo_t* cr)
 {
+	if (!redraw) return;
+
 	if (integer) values[current_value] = int(values[current_value]);
 	Convert_Scaled_To_Value();
 
@@ -126,7 +128,12 @@ void Delirium_UI_Widget_Fader::Left_Button_Press(int xm, int ym)
 	float value = (float)ypixel / (fader_height);
 	if (value < 0) value = 0;
 	if (value > 1) value = 1;
+	float old_normalised_values = normalised_values[0];
 	normalised_values[0] = value;
+	
+	if (old_normalised_values != value) redraw = true;
+		else redraw = false;
+
 }
 
 //-------------------------------------------------------------------------------------------

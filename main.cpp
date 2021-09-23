@@ -31,8 +31,6 @@ int main()
 	float panelY = 0.5;
 	
 	
-	
-	
 	GUI->group_visible[0] = true;
 	GUI->draw_flag = true;					
 	GUI->drag = 0;
@@ -73,6 +71,8 @@ int main()
 	xcb_flush(window_manager.c);
 	
 	song my_song;
+	my_song.window_width = width;
+	my_song.window_height = height;
 	my_song.set_name("This is my first ever song");
 
 	cout << my_song.get_name() << endl;
@@ -106,6 +106,9 @@ int main()
 		{
 			GUI->draw_flag = true;	
 			Delirium_UI_Display_All(GUI, cr);
+			
+			my_song.draw_track_display(cr);
+			
 			cairo_surface_flush(surface);
 			xcb_flush(window_manager.c);
 		}
@@ -138,7 +141,6 @@ int main()
 		if (win_ev.type == WINDOW_EVENT_TYPE_MOUSE_BUTTON_RELEASE)
 		{
 			GUI->drag = false;
-			//xcb_flush(window_manager.c);
 		}
 			
 		//---- MOUSE MOVED OVER WINDOW --------------------------------------------------

@@ -9,8 +9,7 @@
 Delirium_UI_Widget_Base::Delirium_UI_Widget_Base()
 {
 
-
-
+	redraw = true;
 }
 
 
