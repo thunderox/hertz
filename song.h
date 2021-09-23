@@ -83,6 +83,7 @@ class song
 	
 	int window_width;
 	int window_height;
+	int track_scroll_y;
 
 	
 	enum EventName : uint8_t

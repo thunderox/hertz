@@ -74,11 +74,8 @@ int main()
 	my_song.window_width = width;
 	my_song.window_height = height;
 	my_song.set_name("This is my first ever song");
-
-	cout << my_song.get_name() << endl;
 	
-	
-	my_song.load_midi_file("test.mid");
+	my_song.load_midi_file("test2.mid");
 		
 	jack_manager my_jack_manager;
 	my_jack_manager.set_current_manager(&my_jack_manager);
@@ -133,6 +130,15 @@ int main()
 					GUI->Widgets[current_widget]->Draw(cr);
 					xcb_flush(window_manager.c);
 				}
+			}
+			
+			if (win_ev.y > 240)
+			{
+				my_song.track_scroll_y += (win_ev.mouse_button==5) - (win_ev.mouse_button==4);
+				my_song.draw_track_display(cr);
+				xcb_flush(window_manager.c);
+				cout << my_song.track_scroll_y << endl;
+				
 			}
 			
 		}	

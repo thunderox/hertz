@@ -25,6 +25,7 @@ song::~song()
 void song::set_name(string _name)
 {
 	name = _name;
+	track_scroll_y = 0;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -182,6 +183,12 @@ bool song::load_midi_file(string file_name)
 				uint8_t nNoteID = ifs.get();
 				uint8_t nNoteVelocity = ifs.get();
 				vecTracks[nChunk].vecEvents.push_back({ MidiEvent::Type::NoteOff, nNoteID, nNoteVelocity, nStatusTimeDelta });
+				block_event new_block_event;
+				new_block_event.event_type = block_event_type_note_off;
+				new_block_event.note = nNoteID;
+				new_block_event.volume =  nNoteVelocity;
+				new_block_event.delta = nStatusTimeDelta;
+				blocks[current_block].events.push_back(new_block_event);
 			}
 
 			else if ((nStatus & 0xF0) == EventName::VoiceNoteOn)
@@ -209,6 +216,7 @@ bool song::load_midi_file(string file_name)
 					new_block_event.volume =  nNoteVelocity;
 					new_block_event.delta = nStatusTimeDelta;
 					blocks[current_block].events.push_back(new_block_event);
+					
 				}
 			}
 
@@ -430,15 +438,58 @@ void song::draw_track_display(cairo_t* cr)
 	cairo_rectangle(cr, 24,240,window_width-48,600);
 	cairo_fill(cr);
 	
-	int by = 2;
-	int bh = 64;
+	int bx = 2;
+	int bw = 120;
+	float note_width = 180/128;
+
+	int note_on_delta[128];
+	for (int x=0; x<128; x++)
+	{
+		note_on_delta[x] = -1;
+	}
 	
 	for (int x=0; x<tracks.size(); x++)
 	{
 		cairo_set_source_rgb(cr, 0.2,0.2,0.2);
-		cairo_rectangle(cr, 24,240+by,window_width-48,bh);
+		cairo_rectangle(cr, 24+bx,240,bw,600);
 		cairo_fill(cr);
-		by += (bh + 2);
+		
+		int by = 2;
+		cairo_set_source_rgb(cr, 0.8,0.8,0.8);
+		
+		if (track_scroll_y < 0) track_scroll_y = 0;
+		
+		for (int ev=track_scroll_y; ev<track_scroll_y+24; ev++)
+		{
+			if (ev > blocks[x].events.size()-1) break;
+		
+			int event_type = blocks[x].events[ev].event_type;
+			int note = blocks[x].events[ev].note;
+			int delta = blocks[x].events[ev].delta;
+			
+			if (event_type == block_event_type_note_on)
+			{
+				by += (delta/8);
+				note_on_delta[note] = by;
+			}
+			
+			if (event_type == block_event_type_note_off && note_on_delta[note] == -1)
+			{
+				by += (delta/8);
+			}
+			
+			if (event_type == block_event_type_note_off && note_on_delta[note] != -1)
+			{
+				float note_x_pos = ((float)note / 128.0) * bw;
+				by += (delta/8);
+				cairo_rectangle(cr, 24+bx+note_x_pos,240+note_on_delta[note],note_width, by-note_on_delta[note]);
+				cairo_fill(cr);
+				note_on_delta[note] = -1;
+			}
+			
+			if (by > 600) break;
+		}
+		bx += (bw + 2);
 	}
 }
 
