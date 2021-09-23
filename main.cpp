@@ -66,7 +66,6 @@ int main()
         
 	Delirium_UI_Group_Set_Active_Widgets(GUI);
         Delirium_UI_Display_All(GUI, cr);
-        
 	cairo_surface_flush(surface);
 	xcb_flush(window_manager.c);
 	
@@ -134,10 +133,9 @@ int main()
 			
 			if (win_ev.y > 240)
 			{
-				my_song.track_scroll_y += (win_ev.mouse_button==5) - (win_ev.mouse_button==4);
+				my_song.track_scroll_y += ((win_ev.mouse_button==5) - (win_ev.mouse_button==4))*16;
 				my_song.draw_track_display(cr);
 				xcb_flush(window_manager.c);
-				cout << my_song.track_scroll_y << endl;
 				
 			}
 			

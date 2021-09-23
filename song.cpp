@@ -439,8 +439,8 @@ void song::draw_track_display(cairo_t* cr)
 	cairo_fill(cr);
 	
 	int bx = 2;
-	int bw = 120;
-	float note_width = 180/128;
+	int bw = 128;
+	float note_width = (180/128) * 2;
 
 	int note_on_delta[128];
 	for (int x=0; x<128; x++)
@@ -450,46 +450,65 @@ void song::draw_track_display(cairo_t* cr)
 	
 	for (int x=0; x<tracks.size(); x++)
 	{
-		cairo_set_source_rgb(cr, 0.2,0.2,0.2);
+		cairo_set_source_rgb(cr, 0.4,0.4,0.4);
 		cairo_rectangle(cr, 24+bx,240,bw,600);
+		cairo_clip(cr);
+		cairo_set_source_rgb(cr, 0.8,0.8,0.8);
+		cairo_rectangle(cr, 24+bx,240,bw-2,600);
 		cairo_fill(cr);
 		
-		int by = 2;
-		cairo_set_source_rgb(cr, 0.8,0.8,0.8);
-		
+		int by = 16;
+		int delta = 0;
+				
 		if (track_scroll_y < 0) track_scroll_y = 0;
+
+		cairo_set_source_rgb(cr, 0.4,0.4,0.4);
 		
-		for (int ev=track_scroll_y; ev<track_scroll_y+24; ev++)
+		for (int y=240; y<240+600; y+=by)
 		{
-			if (ev > blocks[x].events.size()-1) break;
+	 		cairo_move_to(cr, bx, y- track_scroll_y);
+	 		cairo_line_to(cr, bx+bw+24 + 2, y- track_scroll_y);
+	 		cairo_stroke(cr);
+		}
+		
+		cairo_set_source_rgb(cr, 0,0,0);
+		
+		for (int y=240; y<240+600; y+=(by*4))
+		{
+	 		cairo_move_to(cr, bx, y- track_scroll_y);
+	 		cairo_line_to(cr, bx+bw+24 + 2, y- track_scroll_y);
+	 		cairo_stroke(cr);
+		}
+		
+		for (int ev=0; ev<blocks[x].events.size(); ev++)
+		{
 		
 			int event_type = blocks[x].events[ev].event_type;
 			int note = blocks[x].events[ev].note;
-			int delta = blocks[x].events[ev].delta;
+			delta += blocks[x].events[ev].delta;
 			
 			if (event_type == block_event_type_note_on)
 			{
-				by += (delta/8);
-				note_on_delta[note] = by;
+				note_on_delta[note] = delta / by;
 			}
 			
 			if (event_type == block_event_type_note_off && note_on_delta[note] == -1)
 			{
-				by += (delta/8);
+				note_on_delta[note] = -1;
 			}
 			
 			if (event_type == block_event_type_note_off && note_on_delta[note] != -1)
 			{
 				float note_x_pos = ((float)note / 128.0) * bw;
-				by += (delta/8);
-				cairo_rectangle(cr, 24+bx+note_x_pos,240+note_on_delta[note],note_width, by-note_on_delta[note]);
+				cairo_rectangle(cr, 24+bx+note_x_pos, (240 + note_on_delta[note]) - track_scroll_y ,note_width, (delta/by) - note_on_delta[note] );
 				cairo_fill(cr);
 				note_on_delta[note] = -1;
 			}
 			
-			if (by > 600) break;
+			if (note_on_delta[note]-track_scroll_y > 700) break;
 		}
 		bx += (bw + 2);
+		cairo_reset_clip (cr);
 	}
 }
 
