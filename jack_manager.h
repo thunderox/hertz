@@ -24,11 +24,17 @@ typedef struct
 //--------------------------------------------------
 typedef struct
 {
+	jack_port_t *input_port;
+	jack_port_t *audio_in_left;
+	jack_port_t *audio_in_right;
+	
 	jack_port_t *output_port;
 	jack_port_t *audio_out_left;
 	jack_port_t *audio_out_right;
 	string name;
-} jack_out;
+} track_port;
+
+
 
 //--------------------------------------------------
 typedef struct
@@ -54,8 +60,7 @@ class jack_manager
 		void connect_audio(string, string);
 		int sample_rate;
 		
-		vector<jack_out> jack_outs;
-		vector<jack_in> jack_ins;
+		vector<track_port> track_ports;
 		vector<jack_client> jack_clients;
 	
 	private:

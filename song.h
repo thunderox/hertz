@@ -6,7 +6,6 @@
 #include <vector>
 #include <list>
 #include <algorithm>
-#include <cairo/cairo.h>
 
 using namespace std;
 
@@ -68,8 +67,10 @@ class song
 	int create_track(string);
 	int create_block(string,long,long);
 	bool load_midi_file(string);
+	string get_track_name(int);
+	int get_number_of_tracks();
 	
-	void draw_track_display(cairo_t*);
+	void draw_track_display();
 	
 	void set_name(string);
 	string get_name();
