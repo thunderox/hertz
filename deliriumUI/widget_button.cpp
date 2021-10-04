@@ -14,12 +14,14 @@ void widget_button::draw(NVGcontext* vg)
 	
 	nvgFill(vg);
 
-	nvgFontSize(vg, 12.0f);
+	float font_size = 10.0f;
+	nvgFontSize(vg, font_size);
 	nvgFontFace(vg, "sans");
-	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
-	if (hover) nvgFillColor(vg, nvgRGBA(220,220,220,255));
+
+	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+	if (hover) nvgFillColor(vg, nvgRGBA(255,255,255,255));
 		else nvgFillColor(vg, nvgRGBA(200,200,200,255));
-	nvgText(vg, x+11, y+14, text_top.c_str(),NULL);
+	nvgText(vg, x+4 , y+4, text_top.c_str(),NULL);
 
 }
 

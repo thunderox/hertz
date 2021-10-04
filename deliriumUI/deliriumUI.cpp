@@ -48,7 +48,7 @@ deliriumUI::deliriumUI()
 	screen_height = mode->height;
 	
 	current_window = -1;
-
+	
 }
 
 
@@ -137,6 +137,7 @@ int deliriumUI::main_loop()
 
 	double mx,my;
 	display_all();
+	float old_time = 0;
 	
 	if (current_window > -1 && current_window < windows.size())
 	{
@@ -154,39 +155,44 @@ int deliriumUI::main_loop()
 			}
 			glfwWaitEventsTimeout(1);
 			
-			glfwGetCursorPos(window, &mx, &my);
-
-			int current_widget = windows[current_window].current_widget;
-			mouse_left_button = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
-		
-			if (current_widget > -1 && windows[current_window].widgets[current_widget]->hover)
+			if (glfwGetTime() - old_time > 0.01)
 			{
-				if ( mouse_left_released && windows[current_window].widgets[current_widget]->type != widget_type_switch)
-					mouse_left_released = false;
+				old_time = glfwGetTime();
+				glfwGetCursorPos(window, &mx, &my);
+
+				int current_widget = windows[current_window].current_widget;
+				mouse_left_button = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
 			
-				if ( mouse_left_released && windows[current_window].widgets[current_widget]->type == widget_type_switch)
+				if (current_widget > -1 && windows[current_window].widgets[current_widget]->hover)
 				{
-					windows[current_window].widgets[current_widget]->left_button();
-					update_widget(current_window,current_widget);
-					mouse_left_released = false;
-				}
-			
-				if (mouse_left_button)
-				{				
-					if (windows[current_window].widgets[current_widget]->type != widget_type_switch)
+					if ( mouse_left_released && windows[current_window].widgets[current_widget]->type != widget_type_switch)
+						mouse_left_released = false;
+				
+					if ( mouse_left_released && windows[current_window].widgets[current_widget]->type == widget_type_switch)
 					{
-						windows[current_window].widgets[current_widget]->drag(mx, my);
+						windows[current_window].widgets[current_widget]->left_button();
 						update_widget(current_window,current_widget);
-						
+						mouse_left_released = false;
 					}
+				
+					if (mouse_left_button)
+					{				
+						if (windows[current_window].widgets[current_widget]->type != widget_type_switch)
+						{
+							windows[current_window].widgets[current_widget]->drag(mx, my);
+							update_widget(current_window,current_widget);
+							
+						}
+					}
+					if (mouse_scroll_y == -1) { windows[current_window].widgets[current_widget]->value_inc(); mouse_scroll_y = 0; }
+					if (mouse_scroll_y == 1) { windows[current_window].widgets[current_widget]->value_dec(); mouse_scroll_y = 0; }
 				}
-				if (mouse_scroll_y == -1) { windows[current_window].widgets[current_widget]->value_inc(); mouse_scroll_y = 0; }
-				if (mouse_scroll_y == 1) { windows[current_window].widgets[current_widget]->value_dec(); mouse_scroll_y = 0; }
+				
+				if (!mouse_left_button) mouse_over(mx,my);
+				
+				glfwSwapBuffers(windows[current_window].window);
 			}
 			
-			if (!mouse_left_button) mouse_over(mx,my);
-			
-			glfwSwapBuffers(windows[current_window].window);
 			
 		} while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
 		       glfwWindowShouldClose(window) == 0 );
@@ -216,9 +222,10 @@ bool deliriumUI::mouse_over(int mx, int my)
 			windows[current_window].widgets[x]->hover = true;
 			update_widget(current_window,x);
 			
-		} else
+		} else if (x == windows[current_window].current_widget)
 		{
 			windows[current_window].widgets[x]->hover = false;
+			windows[current_window].current_widget = -1;
 			update_widget(current_window,x);
 		}
 	}
@@ -237,7 +244,7 @@ void deliriumUI::display_all()
 		nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
 		nvgBeginPath(vg);
 		nvgRect(vg, 0,0,screen_width,screen_height);
-		nvgFillPaint(vg, nvgRadialGradient(vg, screen_width/2, screen_height/2,600,1000, nvgRGBA(30,30,30,255),nvgRGBA(10,10,10,255))); 
+		nvgFillPaint(vg, nvgRadialGradient(vg, screen_width/2, screen_height/2,600,1000, nvgRGBA(20,20,20,255),nvgRGBA(5,5,5,255))); 
 		nvgFill(vg);
 
 		for (int x=0; x<windows[current_window].widgets.size(); x++)
@@ -246,7 +253,6 @@ void deliriumUI::display_all()
 			windows[current_window].widgets[x]->draw(vg);
 		}
 		nvgEndFrame(vg);
- 		glfwSwapBuffers(windows[current_window].window);
 	}
 	
 }
@@ -297,7 +303,7 @@ int deliriumUI::create_widget(int type, int win, float x, float y, float w, floa
 		new_widget->x = x * windows[win].snapx;
 		new_widget->y = y * windows[win].snapy;
 		new_widget->w = (w * windows[win].snapx)-1;
-		new_widget->h = (w * windows[win].snapx)-1;
+		new_widget->h = (h * windows[win].snapy)-1;
 		new_widget->type = widget_type_knob;
 		new_widget_created = true;
 	}

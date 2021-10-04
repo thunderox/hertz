@@ -53,21 +53,22 @@ void widget_fader::draw(NVGcontext* vg)
 	nvgStroke(vg);
 
 	nvgBeginPath(vg);
-	nvgFontSize(vg, 9.0f);
+	float font_size = 10.0f;
+	nvgFontSize(vg, font_size);
 	nvgFontFace(vg, "sans");
-	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
+	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
 	if (hover) nvgFillColor(vg, nvgRGBA(255,255,255,255));
 		else nvgFillColor(vg, nvgRGBA(200,200,200,255));
-	float text_width = 4.5f * (float)text_top.length();
-	nvgText(vg, x + ((w / 2) - (text_width / 2)), y+10, text_top.c_str(),NULL);
+	float text_width = (font_size/1.75) * text_top.length();
+	nvgText(vg, x + ((w / 2) - (text_width / 2)), y, text_top.c_str(),NULL);
 
-	nvgFontSize(vg, 12.0f);
 	std::stringstream ss;
-	float trunc_float = roundf(value * 100) / 100;
+	float trunc_float = roundf(value * 1000) / 1000;
 	ss << trunc_float;
 
-	text_width = 6 * ss.str().length();
-	nvgText(vg, x + ((w / 2) - (text_width / 2)), y + (h-bottom_y)+10, ss.str().c_str(), NULL);
+	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_BOTTOM);
+	text_width = (font_size/1.75) * ss.str().length();
+	nvgText(vg, x + ((w / 2) - (text_width / 2)), y + h, ss.str().c_str(), NULL);
 }
 
 

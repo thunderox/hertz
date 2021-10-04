@@ -13,7 +13,7 @@ int main()
 
 	int win = main_gui.create_window(0, 0, main_gui.screen_width, main_gui.screen_height, "Hertz (A Digital Audio Workstation) - ThunderOx Software 2021");
 	main_gui.set_current_window(win);
-	main_gui.set_window_grid(win, 64, 32);
+	main_gui.set_window_grid(win, 64, 48);
 
 	jack_manager my_jack_manager;
 	my_jack_manager.set_current_manager(&my_jack_manager);
@@ -33,12 +33,15 @@ int main()
 	
 	my_song.load_midi_file("test4.mid");
 	
+	std::stringstream ss;
+	
 	for (int tr=1; tr < my_song.get_number_of_tracks(); tr++)
-	{
+	{	ss.str("");
+		ss << tr;
 		main_gui.create_widget(widget_type_button, win, (tr*3.25), 1, 3, 1, my_song.get_track_name(tr));
-		int fader_widget_number = main_gui.create_widget(widget_type_fader, win, (tr*3.25), 2, 1.25, 8, "" );
+		int fader_widget_number = main_gui.create_widget(widget_type_fader, win, (tr*3.25), 2.25, 1.5, 8, ss.str());
 		main_gui.windows[win].widgets[fader_widget_number]->set_value(0.5);
-		int pan_widget_number = main_gui.create_widget(widget_type_knob, win, (tr*3.25), 11, 1.5, 1.5, "PAN");
+		int pan_widget_number = main_gui.create_widget(widget_type_knob, win, (tr*3.25), 10.5, 1.5,2.5, "PAN");
 		main_gui.windows[win].widgets[pan_widget_number]->set_value(0.5);
 	}
 
