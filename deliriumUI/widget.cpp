@@ -8,6 +8,7 @@
 widget::widget()
 {
 	value = 0;
+	default_value = 0;
 	value_increment = 0.05;
 	old_mx = -1;
 	old_my = -1;
@@ -36,6 +37,7 @@ void widget::draw(NVGcontext* vg)
 
 
 }
+
 
 //----------------------------------------------------------------------------------------------
 void widget::drag(float mx,float my)
@@ -67,6 +69,13 @@ void widget::left_button()
 }
 
 //----------------------------------------------------------------------------------------------
+void widget::middle_button()
+{
+	value = default_value;
+	
+}
+
+//----------------------------------------------------------------------------------------------
 void widget::set_value(float _value )
 {
 	if (_value < 0) _value = 0;
@@ -75,7 +84,16 @@ void widget::set_value(float _value )
 }
 
 
+//----------------------------------------------------------------------------------------------
+void widget::set_default_value(float _value )
+{
+	if (_value < 0) _value = 0;
+	if (_value > 1) _value = 1;
+	default_value = _value;
+}
 
+
+ 	
 
 
 

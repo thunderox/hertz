@@ -18,7 +18,8 @@ typedef enum
 	widget_type_button = 1,
 	widget_type_knob = 2,
 	widget_type_switch = 3,
-	widget_type_fader= 4
+	widget_type_fader = 4,
+	widget_type_panel = 5
 } widget_type;
 
 class widget
@@ -33,7 +34,9 @@ class widget
 	void set_size(float,float);
 	virtual void drag(float,float);
 	virtual void set_value(float);
+	void set_default_value(float);
 	virtual void left_button();
+	void middle_button();
 	virtual void value_inc();
 	virtual void value_dec();
 	
@@ -43,6 +46,7 @@ class widget
 	bool hover;
 	int type;
 	float value;
+	float default_value;
 	float value_increment;
 	float scaled_value;
 	float value_min;
@@ -82,6 +86,12 @@ class widget_fader: public widget
 	public:
 	void draw(NVGcontext*);
 	void drag(float, float);
+};
+
+class widget_panel: public widget
+{
+	public:
+	void draw(NVGcontext*);
 };
 
 #endif
