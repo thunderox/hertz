@@ -47,6 +47,7 @@ class deliriumUI
 	int main_loop();
 	bool mouse_over(int,int);
 	void display_all();
+	void refresh_widgets(int);
 	void update_widget(int,int);
 	
 	int create_widget(int,int,float,float,float,float,string);

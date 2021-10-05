@@ -159,6 +159,8 @@ int deliriumUI::main_loop()
 			if (windows[current_window].draw_all) 
 			{
 				display_all();
+				glfwSwapBuffers(windows[current_window].window);
+				display_all();
 				windows[current_window].draw_all = false;
 			}
 			
@@ -167,7 +169,6 @@ int deliriumUI::main_loop()
 			if (glfwGetTime() - old_time > 0.01)
 			{
 				old_time = glfwGetTime();
-				windows[current_window].draw_all = true;
 				glfwGetCursorPos(window, &mx, &my);
 
 				int current_widget = windows[current_window].current_widget;
@@ -181,7 +182,7 @@ int deliriumUI::main_loop()
 					if ( mouse_left_released && windows[current_window].widgets[current_widget]->type == widget_type_switch)
 					{
 						windows[current_window].widgets[current_widget]->left_button();
-						update_widget(current_window,current_widget);
+						windows[current_window].widgets[current_widget]->redraw = true;
 						mouse_left_released = false;
 					}
 				
@@ -190,7 +191,7 @@ int deliriumUI::main_loop()
 						if (windows[current_window].widgets[current_widget]->type != widget_type_switch)
 						{
 							windows[current_window].widgets[current_widget]->drag(mx, my);
-							update_widget(current_window,current_widget);
+							windows[current_window].widgets[current_widget]->redraw = true;
 							
 						}
 					}
@@ -203,14 +204,14 @@ int deliriumUI::main_loop()
 						mouse_middle_button_released = false;
 						windows[current_window].widgets[current_widget]->set_value
 							(windows[current_window].widgets[current_widget]->default_value);
-						update_widget(current_window,current_widget);	
+						windows[current_window].widgets[current_widget]->redraw = true;	
 					}
 					
 				}
 				
 				if (!mouse_left_button) mouse_over(mx,my);
 				
-				glfwSwapBuffers(windows[current_window].window);
+				refresh_widgets(current_window);
 			}
 			
 			
@@ -240,13 +241,13 @@ bool deliriumUI::mouse_over(int mx, int my)
 			windows[current_window].current_widget = x;
 			w = x;
 			windows[current_window].widgets[x]->hover = true;
-			update_widget(current_window,x);
+			windows[current_window].widgets[x]->redraw = true;
 			
 		} else if (x == windows[current_window].current_widget)
 		{
 			windows[current_window].widgets[x]->hover = false;
+			windows[current_window].widgets[x]->redraw = true;
 			windows[current_window].current_widget = -1;
-			update_widget(current_window,x);
 		}
 	}
 
@@ -281,18 +282,32 @@ void deliriumUI::display_all()
 
 void deliriumUI::update_widget(int window, int widget)
 {
+
+}
+
+void deliriumUI::refresh_widgets(int window)
+{
 	if (current_window > -1 && current_window < windows.size())
 	{
-		if (widget > -1 && widget < windows[current_window].widgets.size())
+		NVGcontext* vg = windows[current_window].vg;
+		nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
+
+		for (int x=0; x<windows[window].widgets.size(); x++)
 		{
-			NVGcontext* vg = windows[current_window].vg;
-			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
-			nvgBeginPath(vg);
-			windows[current_window].widgets[widget]->draw(vg);
-			nvgEndFrame(vg);
+			if (windows[current_window].widgets[x]->redraw)
+			{
+				nvgRect(vg, windows[current_window].widgets[x]->x, windows[current_window].widgets[x]->y,
+					windows[current_window].widgets[x]->w, windows[current_window].widgets[x]->h);
+				nvgFillPaint(vg, nvgRadialGradient(vg, screen_width/2, screen_height/2,600,1000, nvgRGBA(20,20,20,255),nvgRGBA(5,5,5,255))); 
+				nvgFill(vg);
+				windows[current_window].widgets[x]->redraw = false;
+				nvgBeginPath(vg);
+				windows[current_window].widgets[x]->draw(vg);
+			}			
 		}
+	nvgEndFrame(vg);
 	}
+	glfwSwapBuffers(windows[current_window].window);
 }
 
 //-----------------------------------------------------------------------------------------------
