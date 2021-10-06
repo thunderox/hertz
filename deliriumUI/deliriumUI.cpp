@@ -163,7 +163,7 @@ int deliriumUI::main_loop()
 				windows[current_window].draw_all = false;
 			}
 			
-			glfwWaitEventsTimeout(1);
+			glfwWaitEventsTimeout(0.25);
 			
 			if (glfwGetTime() - old_time > 0.01)
 			{
@@ -220,11 +220,11 @@ int deliriumUI::main_loop()
 }
 
 //----------------------------------------------------------------------------------------------
-bool deliriumUI::mouse_over(int mx, int my)
+int deliriumUI::mouse_over(int mx, int my)
 {
 
 	Rectangle test_rect;
-	int w = -1;
+	windows[current_window].current_widget = -1;
 
 	for (int x=0; x<windows[current_window].widgets.size(); x++)
 	{
@@ -236,20 +236,18 @@ bool deliriumUI::mouse_over(int mx, int my)
 		if (test_rect.contains(mx,my) && windows[current_window].widgets[x]->type != widget_type_panel)
 		{
 			windows[current_window].current_widget = x;
-			w = x;
 			windows[current_window].widgets[x]->hover = true;
 			windows[current_window].widgets[x]->redraw = true;
 			
-		} else if (x == windows[current_window].current_widget)
+		}
+		if (!test_rect.contains(mx,my) && windows[current_window].widgets[x]->hover)
 		{
 			windows[current_window].widgets[x]->hover = false;
 			windows[current_window].widgets[x]->redraw = true;
-			windows[current_window].current_widget = -1;
 		}
 	}
 
-	if (w>-1) return true;
-		else return false;
+	return windows[current_window].current_widget;
 }
 
 //----------------------------------------------------------------------------------------------

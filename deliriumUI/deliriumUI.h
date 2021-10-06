@@ -30,8 +30,14 @@ class Rectangle
 	
 	private:
 	
-	int x,y,width,height;
-	
+	int x,y,width,height;	
+};
+
+struct group
+{
+	string name;
+	vector <string> members;
+	int visible_member;
 };
 
 class deliriumUI
@@ -45,7 +51,7 @@ class deliriumUI
 	void set_window_grid(int,int,int);
 	
 	int main_loop();
-	bool mouse_over(int,int);
+	int mouse_over(int,int);
 	void display_all();
 	void refresh_widgets(int);
 	

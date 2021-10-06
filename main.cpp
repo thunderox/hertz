@@ -35,7 +35,7 @@ int main()
 	
 	std::stringstream ss;
 	
-	// int panel_mixer = main_gui.create_widget(widget_type_panel, win, 1,1, 50,14, "MIXER");
+	int panel_mixer = main_gui.create_widget(widget_type_panel, win, 1,1, 50,14, "MIXER");
 	
 	for (int tr=1; tr < my_song.get_number_of_tracks(); tr++)
 	{	ss.str("");
