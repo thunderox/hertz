@@ -7,8 +7,6 @@
 //----------------------------------------------------------------------------------------------
 void widget_fader::draw(NVGcontext* vg)
 {
-
-
 	nvgBeginPath(vg);
 	nvgRect(vg, x,y,w,h);
 	nvgFillPaint(vg, nvgLinearGradient(vg, x,y,x+w,y+h, nvgRGBA(80,80,80,255),nvgRGBA(30,30,30,255))); 

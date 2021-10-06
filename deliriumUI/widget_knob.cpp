@@ -29,9 +29,9 @@ void widget_knob::draw(NVGcontext* vg)
 	ccf2 = (w+h)/5.5;
 	
 	nvgBeginPath(vg);
-	nvgStrokeColor(vg, nvgRGBA(100,100,100,255));
+	nvgStrokeColor(vg, nvgRGBA(100,100,100,200));
 
-	if (value == 1)nvgStrokeColor(vg, nvgRGBA(255,255,255,255));
+	if (value == 1)nvgStrokeColor(vg, nvgRGBA(255,255,255,200));
 	
 	float scale_inc;
 	
@@ -47,7 +47,7 @@ void widget_knob::draw(NVGcontext* vg)
 		if (scale > 0.95-value && value !=0)
 		{
 			nvgStroke(vg);
-			nvgStrokeColor(vg, nvgRGBA(255,255,255,255));
+			nvgStrokeColor(vg, nvgRGBA(255,255,255,200));
 			nvgBeginPath(vg);
 		}
 		

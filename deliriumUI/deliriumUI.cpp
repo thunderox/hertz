@@ -160,7 +160,6 @@ int deliriumUI::main_loop()
 			{
 				display_all();
 				glfwSwapBuffers(windows[current_window].window);
-				display_all();
 				windows[current_window].draw_all = false;
 			}
 			
@@ -210,10 +209,8 @@ int deliriumUI::main_loop()
 				}
 				
 				if (!mouse_left_button) mouse_over(mx,my);
-				
-				refresh_widgets(current_window);
 			}
-			
+			refresh_widgets(current_window);
 			
 		} while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
 		       glfwWindowShouldClose(window) == 0 );
@@ -280,26 +277,33 @@ void deliriumUI::display_all()
 
 //-----------------------------------------------------------------------------------------------
 
-void deliriumUI::update_widget(int window, int widget)
-{
-
-}
 
 void deliriumUI::refresh_widgets(int window)
 {
+	bool redraw = false;
+
 	if (current_window > -1 && current_window < windows.size())
 	{
 		NVGcontext* vg = windows[current_window].vg;
 		nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
 
+		nvgBeginPath(vg);
+		nvgFillPaint(vg, nvgRadialGradient(vg, screen_width/2, screen_height/2,600,1000, nvgRGBA(20,20,20,255),nvgRGBA(5,5,5,255)));
 		for (int x=0; x<windows[window].widgets.size(); x++)
 		{
 			if (windows[current_window].widgets[x]->redraw)
 			{
 				nvgRect(vg, windows[current_window].widgets[x]->x, windows[current_window].widgets[x]->y,
 					windows[current_window].widgets[x]->w, windows[current_window].widgets[x]->h);
-				nvgFillPaint(vg, nvgRadialGradient(vg, screen_width/2, screen_height/2,600,1000, nvgRGBA(20,20,20,255),nvgRGBA(5,5,5,255))); 
-				nvgFill(vg);
+					redraw = true; 
+			}
+			if (redraw) nvgFill(vg);
+		}
+
+		for (int x=0; x<windows[window].widgets.size(); x++)
+		{
+			if (windows[current_window].widgets[x]->redraw)
+			{
 				windows[current_window].widgets[x]->redraw = false;
 				nvgBeginPath(vg);
 				windows[current_window].widgets[x]->draw(vg);
@@ -307,7 +311,7 @@ void deliriumUI::refresh_widgets(int window)
 		}
 	nvgEndFrame(vg);
 	}
-	glfwSwapBuffers(windows[current_window].window);
+	if (redraw) glfwSwapBuffers(windows[current_window].window);
 }
 
 //-----------------------------------------------------------------------------------------------
