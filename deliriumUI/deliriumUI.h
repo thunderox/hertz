@@ -10,7 +10,6 @@
 #include "widget.h"
 #include <stdio.h>
 #include <stdlib.h>
-// #include <unistd.h>
 
 #include "../nanovg/nanovg.h"
 #include "../nanovg/nanovg_gl.h"

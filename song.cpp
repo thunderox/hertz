@@ -1,5 +1,6 @@
 
 #include "song.h"
+#define NANOVG_GL3_IMPLEMENTATION
 
 //--------------------------------------------------------------------------------------------------
 // CONSTRUCTOR
@@ -432,9 +433,17 @@ int song::create_block(string name,long start, long length)
 //----------------------------------------------------------------------------------------
 // DRAW TRACK DISPLAY
 
-void song::draw_track_display()
+void song::draw_track_display(NVGcontext* vg)
 {
+	int x=0; 
+	int y=500;
+	int w=300;
+	int h=300;
 
+	nvgBeginPath(vg);
+	nvgRect(vg, x,y,300,300);
+	nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0,h, nvgRGBA(100,100,120,255),nvgRGBA(30,30,30,255))); 	
+	nvgFill(vg);
 }
 
 //----------------------------------------------------------------------------------------

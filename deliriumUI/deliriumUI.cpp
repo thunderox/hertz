@@ -142,7 +142,6 @@ void deliriumUI::set_window_grid(int win, int gridx, int gridy)
 
 int deliriumUI::main_loop()
 {
-
 	double mx,my;
 	display_all();
 	float old_time = 0;
@@ -153,9 +152,7 @@ int deliriumUI::main_loop()
 		NVGcontext* vg = windows[current_window].vg; 
 		glfwSetMouseButtonCallback(window, mouse_button_callback);
 		glfwSetScrollCallback(window, scroll_callback);
-		
-		do
-		{ 
+
 			if (windows[current_window].draw_all) 
 			{
 				display_all();
@@ -211,12 +208,9 @@ int deliriumUI::main_loop()
 				if (!mouse_left_button) mouse_over(mx,my);
 			}
 			refresh_widgets(current_window);
-			
-		} while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
-		       glfwWindowShouldClose(window) == 0 );
-		return -1;
+		
 	}
-	else return 0;
+	return 0;
 }
 
 //----------------------------------------------------------------------------------------------
@@ -233,7 +227,8 @@ int deliriumUI::mouse_over(int mx, int my)
 		test_rect.setWidth(windows[current_window].widgets[x]->w );
 		test_rect.setHeight(windows[current_window].widgets[x]->h );
 
-		if (test_rect.contains(mx,my) && windows[current_window].widgets[x]->type != widget_type_panel)
+		if (test_rect.contains(mx,my) && windows[current_window].widgets[x]->type != widget_type_panel
+			&& windows[current_window].widgets[x]->type != widget_type_grid)
 		{
 			windows[current_window].current_widget = x;
 			windows[current_window].widgets[x]->hover = true;
@@ -310,7 +305,6 @@ void deliriumUI::refresh_widgets(int window)
 		}
 	nvgEndFrame(vg);
 	}
-	if (redraw) glfwSwapBuffers(windows[current_window].window);
 }
 
 //-----------------------------------------------------------------------------------------------

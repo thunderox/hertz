@@ -3,11 +3,14 @@
 #include "deliriumUI/deliriumUI.h"
 #include "jack_manager.h"
 #include "song.h"
+#define NANOVG_GL3_IMPLEMENTATION
 
 using namespace std;
 
 int main()
 {
+
+	//------------ SET UP GUI
 
 	deliriumUI main_gui;
 
@@ -59,8 +62,20 @@ int main()
 	main_gui.windows[win].widgets[volume_knob]->set_value(0.5);
 	main_gui.windows[win].widgets[volume_knob]->set_default_value(0.5);
 
-	main_gui.main_loop();
+	int current_window = main_gui.current_window;
+	
+	//------------ MAIN LOOP
 
+	do
+	{
+		main_gui.main_loop();
+		NVGcontext* vg = main_gui.windows[current_window].vg;
+		my_song.draw_track_display(vg);
+		glfwSwapBuffers(main_gui.windows[current_window].window);
+		
+	} while( glfwGetKey(main_gui.windows[current_window].window, GLFW_KEY_ESCAPE ) != GLFW_PRESS
+		&& glfwWindowShouldClose(main_gui.windows[current_window].window) == 0 );
+		
 	 my_jack_manager.close_client("hertz"); 	
 	 
 

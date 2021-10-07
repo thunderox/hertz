@@ -1,4 +1,7 @@
 
+#ifndef SONG_H
+#define SONG_H
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -6,6 +9,13 @@
 #include <vector>
 #include <list>
 #include <algorithm>
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include "nanovg/nanovg.h"
+#include "nanovg/nanovg_gl.h"
+#include "nanovg/nanovg_gl_utils.h"
 
 using namespace std;
 
@@ -64,13 +74,16 @@ class song
 	public:
 	song();
 	~song();
+	
+	// SONG CREATION AND EDITING FUNCTIONS
+	
 	int create_track(string);
 	int create_block(string,long,long);
 	bool load_midi_file(string);
 	string get_track_name(int);
 	int get_number_of_tracks();
 	
-	void draw_track_display();
+	void draw_track_display(NVGcontext*);
 	
 	void set_name(string);
 	string get_name();
@@ -159,5 +172,9 @@ class song
 
 	
 };
+
+#endif
+
+
 
 
