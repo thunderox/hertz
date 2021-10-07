@@ -19,8 +19,8 @@ void widget_knob::draw(NVGcontext* vg)
 	int cx = x + (w/2);
 	int cy = y + ((h/2) + (ccf1/4));
 
-	if (hover) nvgFillPaint(vg, nvgRadialGradient(vg, x+(w/2),y+(h/2),5,30, nvgRGBA(100,100,120,255),nvgRGBA(30,30,30,255)));
-		else nvgFillPaint(vg, nvgRadialGradient(vg, x+(w/2),y+(h/2),5,30, nvgRGBA(70,70,90,255),nvgRGBA(10,10,10,255)));
+	if (hover) nvgFillPaint(vg, nvgRadialGradient(vg, x+(w/2),y+(h/2),1,w/3, nvgRGBA(100,100,120,255),nvgRGBA(30,30,30,255)));
+		else nvgFillPaint(vg, nvgRadialGradient(vg, x+(w/2),y+(h/2),1,w/3, nvgRGBA(70,70,90,255),nvgRGBA(10,10,10,255)));
 	nvgCircle(vg, cx,cy, ccf1);
 	nvgFill(vg);
 	

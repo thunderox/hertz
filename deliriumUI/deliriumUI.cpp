@@ -150,7 +150,7 @@ int deliriumUI::main_loop()
 	if (current_window > -1 && current_window < windows.size())
 	{
 		GLFWwindow* window = windows[current_window].window;
-		NVGcontext* vg = windows[current_window].vg;
+		NVGcontext* vg = windows[current_window].vg; 
 		glfwSetMouseButtonCallback(window, mouse_button_callback);
 		glfwSetScrollCallback(window, scroll_callback);
 		
@@ -259,6 +259,7 @@ void deliriumUI::display_all()
 		NVGcontext* vg = windows[current_window].vg;
 		nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
 		nvgBeginPath(vg);
+		nvgScissor(vg, 0,0,128,128);
 		nvgRect(vg, 0,0,screen_width,screen_height);
 		nvgFillPaint(vg, nvgRadialGradient(vg, screen_width/2, screen_height/2,600,1000, nvgRGBA(20,20,20,255),nvgRGBA(5,5,5,255))); 
 		nvgFill(vg);
@@ -286,7 +287,7 @@ void deliriumUI::refresh_widgets(int window)
 		nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
 
 		nvgBeginPath(vg);
-		nvgFillPaint(vg, nvgRadialGradient(vg, screen_width/2, screen_height/2,600,1000, nvgRGBA(20,20,20,255),nvgRGBA(5,5,5,255)));
+		nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0, screen_height/2, nvgRGBA(40,40,40,255),nvgRGBA(10,10,10,255)));
 		for (int x=0; x<windows[window].widgets.size(); x++)
 		{
 			if (windows[current_window].widgets[x]->redraw)
@@ -352,6 +353,13 @@ int deliriumUI::create_widget(int type, int win, float x, float y, float w, floa
 	{
 		new_widget = new widget_panel();
 		new_widget->type = widget_type_panel;
+		new_widget_created = true;
+	}
+	
+	if (type == widget_type_grid)
+	{
+		new_widget = new widget_grid();
+		new_widget->type = widget_type_grid;
 		new_widget_created = true;
 	}
 	

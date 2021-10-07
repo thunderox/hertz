@@ -35,7 +35,8 @@ int main()
 	
 	std::stringstream ss;
 	
-	int panel_mixer = main_gui.create_widget(widget_type_panel, win, 1,1, 50,14, "MIXER");
+	int panel_mixer = main_gui.create_widget(widget_type_panel, win, 1,0.5, 42,14, "MIXER");
+	int panel_editor = main_gui.create_widget(widget_type_panel, win, 44,0.5, 20,30, "EDITOR");
 	
 	for (int tr=1; tr < my_song.get_number_of_tracks(); tr++)
 	{	ss.str("");
@@ -46,12 +47,15 @@ int main()
 		main_gui.windows[win].widgets[fader_widget_number]->set_value(0.5);
 		main_gui.windows[win].widgets[fader_widget_number]->set_default_value(0.5);
 		
-		int pan_widget_number = main_gui.create_widget(widget_type_knob, win, (tr*3.25)+4, 10.5, 1.5,2.5, "PAN");
+		int pan_widget_number = main_gui.create_widget(widget_type_knob, win, (tr*3.25)+4.5, 11, 2,3, "PAN");
 		main_gui.windows[win].widgets[pan_widget_number]->set_value(0.5);
 		main_gui.windows[win].widgets[pan_widget_number]->set_default_value(0.5);
+		
+		main_gui.create_widget(widget_type_grid, win, (tr*3.25)+4, 16, 3.2, 24, "");
+		
 	}
 	
-	int volume_knob = main_gui.create_widget(widget_type_knob, win, 1, 1, 4,5, "VOLUME");
+	int volume_knob = main_gui.create_widget(widget_type_knob, win, 1, 8, 4,5, "VOLUME");
 	main_gui.windows[win].widgets[volume_knob]->set_value(0.5);
 	main_gui.windows[win].widgets[volume_knob]->set_default_value(0.5);
 

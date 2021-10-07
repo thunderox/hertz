@@ -8,7 +8,7 @@
 void widget_panel::draw(NVGcontext* vg)
 {
 	nvgRect(vg, x,y,w,h);
-	nvgFillPaint(vg, nvgRadialGradient(vg, x+(w/2),y+(h/2),30,1000, nvgRGBA(30,30,30,255),nvgRGBA(5,5,5,255))); 
+	nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0, screen_height[0]/2, nvgRGBA(40,40,40,255),nvgRGBA(10,10,10,255))); 
 
 	nvgFill(vg);
 

@@ -19,7 +19,8 @@ typedef enum
 	widget_type_knob = 2,
 	widget_type_switch = 3,
 	widget_type_fader = 4,
-	widget_type_panel = 5
+	widget_type_panel = 5,
+	widget_type_grid = 6
 } widget_type;
 
 class widget
@@ -90,6 +91,12 @@ class widget_fader: public widget
 };
 
 class widget_panel: public widget
+{
+	public:
+	void draw(NVGcontext*);
+};
+
+class widget_grid: public widget
 {
 	public:
 	void draw(NVGcontext*);
