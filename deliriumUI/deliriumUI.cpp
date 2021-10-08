@@ -143,8 +143,6 @@ void deliriumUI::set_window_grid(int win, int gridx, int gridy)
 int deliriumUI::main_loop()
 {
 	double mx,my;
-	display_all();
-	float old_time = 0;
 	
 	if (current_window > -1 && current_window < windows.size())
 	{
@@ -152,19 +150,10 @@ int deliriumUI::main_loop()
 		NVGcontext* vg = windows[current_window].vg; 
 		glfwSetMouseButtonCallback(window, mouse_button_callback);
 		glfwSetScrollCallback(window, scroll_callback);
-
-			if (windows[current_window].draw_all) 
-			{
-				display_all();
-				glfwSwapBuffers(windows[current_window].window);
-				windows[current_window].draw_all = false;
-			}
 			
 			glfwWaitEventsTimeout(0.25);
 			
-			if (glfwGetTime() - old_time > 0.01)
-			{
-				old_time = glfwGetTime();
+
 				glfwGetCursorPos(window, &mx, &my);
 
 				int current_widget = windows[current_window].current_widget;
@@ -188,7 +177,6 @@ int deliriumUI::main_loop()
 						{
 							windows[current_window].widgets[current_widget]->drag(mx, my);
 							windows[current_window].widgets[current_widget]->redraw = true;
-							
 						}
 					}
 					
@@ -200,13 +188,12 @@ int deliriumUI::main_loop()
 						mouse_middle_button_released = false;
 						windows[current_window].widgets[current_widget]->set_value
 							(windows[current_window].widgets[current_widget]->default_value);
-						windows[current_window].widgets[current_widget]->redraw = true;	
+						windows[current_window].widgets[current_widget]->redraw = true;
 					}
-					
 				}
 				
 				if (!mouse_left_button) mouse_over(mx,my);
-			}
+			
 			refresh_widgets(current_window);
 		
 	}
@@ -274,7 +261,7 @@ void deliriumUI::display_all()
 
 void deliriumUI::refresh_widgets(int window)
 {
-	bool redraw = false;
+	windows[window].widget_draw = false;
 
 	if (current_window > -1 && current_window < windows.size())
 	{
@@ -289,9 +276,9 @@ void deliriumUI::refresh_widgets(int window)
 			{
 				nvgRect(vg, windows[current_window].widgets[x]->x, windows[current_window].widgets[x]->y,
 					windows[current_window].widgets[x]->w, windows[current_window].widgets[x]->h);
-					redraw = true; 
+					windows[window].widget_draw = true; 
 			}
-			if (redraw) nvgFill(vg);
+			if (windows[window].widget_draw) nvgFill(vg);
 		}
 
 		for (int x=0; x<windows[window].widgets.size(); x++)
@@ -305,6 +292,7 @@ void deliriumUI::refresh_widgets(int window)
 		}
 	nvgEndFrame(vg);
 	}
+	
 }
 
 //-----------------------------------------------------------------------------------------------

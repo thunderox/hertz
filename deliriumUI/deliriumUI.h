@@ -66,6 +66,7 @@ class deliriumUI
 		GLFWwindow* window;
 		NVGcontext* vg;
 		bool draw_all;
+		bool widget_draw;
 		float gridx,gridy,snapx,snapy;
 		vector <widget*> widgets;
 		int current_widget;

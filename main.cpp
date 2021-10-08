@@ -63,15 +63,39 @@ int main()
 	main_gui.windows[win].widgets[volume_knob]->set_default_value(0.5);
 
 	int current_window = main_gui.current_window;
+	NVGcontext* vg = main_gui.windows[current_window].vg;
+	
+	float old_time = 0;
+
+	main_gui.display_all();
+	my_song.draw_track_display(vg);
+	glfwSwapBuffers(main_gui.windows[current_window].window);
+	
+	main_gui.display_all();
+	my_song.draw_track_display(vg);
+	glfwSwapBuffers(main_gui.windows[current_window].window);
 	
 	//------------ MAIN LOOP
 
 	do
 	{
-		main_gui.main_loop();
-		NVGcontext* vg = main_gui.windows[current_window].vg;
-		my_song.draw_track_display(vg);
-		glfwSwapBuffers(main_gui.windows[current_window].window);
+		glfwWaitEventsTimeout(0.01);
+
+		if (glfwGetTime() - old_time > 0.01)
+		{		
+			old_time = glfwGetTime();
+			main_gui.main_loop();
+		
+			if (main_gui.windows[current_window].widget_draw)
+			{
+	
+				old_time = glfwGetTime();
+				main_gui.windows[current_window].widget_draw = false;	
+			
+				my_song.draw_track_display(vg);
+				glfwSwapBuffers(main_gui.windows[current_window].window);
+			}
+		}
 		
 	} while( glfwGetKey(main_gui.windows[current_window].window, GLFW_KEY_ESCAPE ) != GLFW_PRESS
 		&& glfwWindowShouldClose(main_gui.windows[current_window].window) == 0 );
