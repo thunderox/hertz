@@ -69,10 +69,12 @@ int main()
 
 	main_gui.display_all();
 	my_song.draw_track_display(vg);
+	nvgEndFrame(vg);
 	glfwSwapBuffers(main_gui.windows[current_window].window);
 	
 	main_gui.display_all();
 	my_song.draw_track_display(vg);
+	nvgEndFrame(vg);
 	glfwSwapBuffers(main_gui.windows[current_window].window);
 	
 	//------------ MAIN LOOP

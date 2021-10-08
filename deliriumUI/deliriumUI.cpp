@@ -241,7 +241,7 @@ void deliriumUI::display_all()
 		NVGcontext* vg = windows[current_window].vg;
 		nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
 		nvgBeginPath(vg);
-		nvgScissor(vg, 0,0,128,128);
+		// nvgScissor(vg, 0,0,128,128);
 		nvgRect(vg, 0,0,screen_width,screen_height);
 		nvgFillPaint(vg, nvgRadialGradient(vg, screen_width/2, screen_height/2,600,1000, nvgRGBA(20,20,20,255),nvgRGBA(5,5,5,255))); 
 		nvgFill(vg);
