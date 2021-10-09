@@ -42,6 +42,9 @@ typedef struct
 {
 	string name;
 	float volume;
+	
+	int x,y,w,h;
+	
 } track;
 
 const int block_event_type_note_on = 1;
@@ -83,7 +86,7 @@ class song
 	string get_track_name(int);
 	int get_number_of_tracks();
 	
-	void draw_track_display(NVGcontext*);
+	void draw_track_display(NVGcontext*, int);
 	
 	void set_name(string);
 	string get_name();

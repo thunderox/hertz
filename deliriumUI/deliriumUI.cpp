@@ -214,8 +214,7 @@ int deliriumUI::mouse_over(int mx, int my)
 		test_rect.setWidth(windows[current_window].widgets[x]->w );
 		test_rect.setHeight(windows[current_window].widgets[x]->h );
 
-		if (test_rect.contains(mx,my) && windows[current_window].widgets[x]->type != widget_type_panel
-			&& windows[current_window].widgets[x]->type != widget_type_grid)
+		if (test_rect.contains(mx,my) && windows[current_window].widgets[x]->type != widget_type_panel)
 		{
 			windows[current_window].current_widget = x;
 			windows[current_window].widgets[x]->hover = true;
@@ -272,7 +271,7 @@ void deliriumUI::refresh_widgets(int window)
 		nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0, screen_height/2, nvgRGBA(40,40,40,255),nvgRGBA(10,10,10,255)));
 		for (int x=0; x<windows[window].widgets.size(); x++)
 		{
-			if (windows[current_window].widgets[x]->redraw)
+			if (windows[current_window].widgets[x]->redraw && windows[current_window].widgets[x]->type != widget_type_grid)
 			{
 				nvgRect(vg, windows[current_window].widgets[x]->x, windows[current_window].widgets[x]->y,
 					windows[current_window].widgets[x]->w, windows[current_window].widgets[x]->h);

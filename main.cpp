@@ -37,9 +37,24 @@ int main()
 	my_song.load_midi_file("test4.mid");
 	
 	std::stringstream ss;
+	int song_track_widget_number[256];
+	
+	for (int trk=0; trk < my_song.get_number_of_tracks(); trk++)
+	{
+		int widget_grid_edit = main_gui.create_widget(widget_type_grid, win, (trk*3.25)+4, 16, 3.2, 24, "");
+		song_track_widget_number[widget_grid_edit] = trk;
+		
+		my_song.tracks[trk].x = main_gui.windows[win].widgets[widget_grid_edit]->x;
+		my_song.tracks[trk].y = main_gui.windows[win].widgets[widget_grid_edit]->y;
+		my_song.tracks[trk].w = main_gui.windows[win].widgets[widget_grid_edit]->w;
+		my_song.tracks[trk].h = main_gui.windows[win].widgets[widget_grid_edit]->h;
+	}
+
 	
 	int panel_mixer = main_gui.create_widget(widget_type_panel, win, 1,0.5, 42,14, "MIXER");
 	int panel_editor = main_gui.create_widget(widget_type_panel, win, 44,0.5, 20,30, "EDITOR");
+	
+
 	
 	for (int tr=1; tr < my_song.get_number_of_tracks(); tr++)
 	{	ss.str("");
@@ -53,10 +68,8 @@ int main()
 		int pan_widget_number = main_gui.create_widget(widget_type_knob, win, (tr*3.25)+4.5, 11, 2,3, "PAN");
 		main_gui.windows[win].widgets[pan_widget_number]->set_value(0.5);
 		main_gui.windows[win].widgets[pan_widget_number]->set_default_value(0.5);
-		
-		main_gui.create_widget(widget_type_grid, win, (tr*3.25)+4, 16, 3.2, 24, "");
-		
 	}
+	
 	
 	int volume_knob = main_gui.create_widget(widget_type_knob, win, 1, 8, 4,5, "VOLUME");
 	main_gui.windows[win].widgets[volume_knob]->set_value(0.5);
@@ -67,15 +80,28 @@ int main()
 	
 	float old_time = 0;
 
+	// UPDATE GUI DISPLAY TWICE BEFORE MAIN LOOP - Needed on some systems or back buffer is blank when swapped to front.
+
+
 	main_gui.display_all();
-	my_song.draw_track_display(vg);
+	for (int trk=0; trk<my_song.get_number_of_tracks(); trk++)
+	{
+		my_song.draw_track_display(vg, trk);
+	}
+
 	nvgEndFrame(vg);
 	glfwSwapBuffers(main_gui.windows[current_window].window);
 	
 	main_gui.display_all();
-	my_song.draw_track_display(vg);
+	for (int trk=0; trk<my_song.get_number_of_tracks(); trk++)
+	{
+
+		my_song.draw_track_display(vg, trk);
+	}
 	nvgEndFrame(vg);
 	glfwSwapBuffers(main_gui.windows[current_window].window);
+	
+	int current_song_track = 0;
 	
 	//------------ MAIN LOOP
 
@@ -87,15 +113,26 @@ int main()
 		{		
 			old_time = glfwGetTime();
 			main_gui.main_loop();
-		
+			
+			int current_widget = main_gui.windows[current_window].current_widget;
+								
 			if (main_gui.windows[current_window].widget_draw)
 			{
 	
-				old_time = glfwGetTime();
-				main_gui.windows[current_window].widget_draw = false;	
-			
-				my_song.draw_track_display(vg);
+				main_gui.windows[current_window].widget_draw = false;
+				nvgEndFrame(vg);
 				glfwSwapBuffers(main_gui.windows[current_window].window);
+			}
+			
+			if (current_widget > -1)
+			{
+				if (main_gui.windows[current_window].widgets[current_widget]->type == widget_type_grid)
+				{
+					current_song_track = song_track_widget_number[current_widget];
+						my_song.draw_track_display(vg, current_song_track);
+						nvgEndFrame(vg);
+						glfwSwapBuffers(main_gui.windows[current_window].window);
+				}
 			}
 		}
 		

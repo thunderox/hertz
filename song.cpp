@@ -433,18 +433,45 @@ int song::create_block(string name,long start, long length)
 //----------------------------------------------------------------------------------------
 // DRAW TRACK DISPLAY
 
-void song::draw_track_display(NVGcontext* vg)
+void song::draw_track_display(NVGcontext* vg, int track_number)
 {
-	int x=0; 
-	int y=500;
-	int w=300;
-	int h=300;
+
+	if (track_number < 0 || track_number > tracks.size()) return;
+
+	int x = tracks[track_number].x;
+	int y = tracks[track_number].y;
+	int w = tracks[track_number].w;
+	int h = tracks[track_number].h;
 
 	nvgBeginPath(vg);
-	nvgRect(vg, x,y,300,300);
-	nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0,h, nvgRGBA(100,100,120,255),nvgRGBA(30,30,30,255))); 	
+	nvgRect(vg, x,y,w,h);
+	nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0,h, nvgRGBA(255,255,255,255),nvgRGBA(200,200,200,255))); 	
 	nvgFill(vg);
+	
+	nvgBeginPath(vg);
+	nvgRect(vg, x,y,w,h);
+	nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0,h, nvgRGBA(200,200,200,255),nvgRGBA(160,160,160,255))); 
+	nvgFill(vg);
+
+	nvgBeginPath(vg);
+	nvgStrokeColor(vg, nvgRGBA(0,0,0,120));
+	
+	for (int gy=0; gy<h; gy+=16)
+	{
+		nvgMoveTo(vg, x, y+gy);
+		nvgLineTo(vg, x+w, y+gy);
+	}
+	
+	for (int gx=0; gx<w; gx+=8)
+	{
+		nvgMoveTo(vg, x+gx, y);
+		nvgLineTo(vg, x+gx, y+h);
+	}
+	
+	nvgStroke(vg);
 }
+
+
 
 //----------------------------------------------------------------------------------------
 // DRAW TRACK DISPLAY
