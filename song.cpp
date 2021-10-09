@@ -128,7 +128,59 @@ void song::draw_track_display(NVGcontext* vg, int track_number)
 		nvgLineTo(vg, x+gx, y+h);
 	}
 	
+	int bx=8;
+	int by=32;
+	int bw = 7;
+	float note_width = (180/128) * 2;
+	int delta = 0;
+	
+	int note_on_delta[128];
+	for (int x=0; x<128; x++)
+	{
+		note_on_delta[x] = -1;
+	}
+	
 	nvgStroke(vg);
+	
+	nvgBeginPath(vg);
+	nvgFillColor(vg, nvgRGBA(0,0,0,255));
+	
+	for (int blkin = 0; blkin < tracks[track_number].block_instances.size(); blkin++)
+	{
+		int block_number = tracks[track_number].block_instances[blkin].block_number;
+	
+		for (int ev=0; ev<blocks[block_number].events.size(); ev++)
+		{	
+			int event_type = blocks[block_number].events[ev].event_type;
+			int note = blocks[block_number].events[ev].note;
+			delta += blocks[block_number].events[ev].delta;
+				
+				if (note > -1 && note < 128)
+				{	
+				
+				if (event_type == block_event_type_note_on)
+				{
+					note_on_delta[note] = delta / by;
+				}
+					
+				if (event_type == block_event_type_note_off && note_on_delta[note] == -1)
+				{
+					note_on_delta[note] = -1;
+				}
+					
+				if (event_type == block_event_type_note_off && note_on_delta[note] != -1)
+				{
+					float note_x_pos = ((float)note / w) * bw;
+					nvgRect(vg, x+note_x_pos, y+ (note_on_delta[note] - track_scroll_y) ,note_width, (delta/by) - note_on_delta[note]);
+					nvgFill(vg);
+					note_on_delta[note] = -1;
+				}
+			}
+			
+		}
+	}
+		
+	
 }
 
 
