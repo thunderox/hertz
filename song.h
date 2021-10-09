@@ -19,10 +19,6 @@
 
 using namespace std;
 
-const int event_type_note = 1;
-
-
-
 //-----------------------------------------------------------------------
 typedef struct
 {
@@ -37,6 +33,16 @@ typedef struct
 	long time;
 } tempo_event;
 
+//--------------------------------------------------------------------------
+
+typedef struct
+{
+	int block_number;
+	int delta_time;
+	bool visible;
+	string name;
+} block_instance;
+
 //-----------------------------------------------------------------------
 typedef struct
 {
@@ -44,6 +50,8 @@ typedef struct
 	float volume;
 	
 	int x,y,w,h;
+	
+	vector <block_instance> block_instances; 	
 	
 } track;
 
@@ -60,6 +68,9 @@ typedef struct
 	
 } block_event;
 
+
+
+
 //-----------------------------------------------------------------------
 typedef struct
 {
@@ -70,6 +81,7 @@ typedef struct
 	vector <block_event> events;
 } block;
 
+
 //-------------------------------------------------------------------------------
 class song
 
@@ -78,16 +90,8 @@ class song
 	song();
 	~song();
 	
-	// SONG CREATION AND EDITING FUNCTIONS
-	
-	int create_track(string);
-	int create_block(string,long,long);
-	bool load_midi_file(string);
-	string get_track_name(int);
-	int get_number_of_tracks();
-	
-	void draw_track_display(NVGcontext*, int);
-	
+	// SONG
+
 	void set_name(string);
 	string get_name();
 	
@@ -100,8 +104,26 @@ class song
 	
 	int window_width;
 	int window_height;
+	
+	int play_head;
 	int track_scroll_y;
+	
+	// TRACKS ----------------------------------	
 
+	int create_track(string);	
+	string get_track_name(int);
+	int get_number_of_tracks();
+	void draw_track_display(NVGcontext*, int);
+
+	// BLOCKS -----------------------------------------
+
+	int create_block(string,long,long);
+	void find_visible_blocks();
+	bool create_block_instance(string, int, int, int, bool);
+
+	// MIDI -------------------------------------------
+	
+	bool load_midi_file(string);
 	
 	enum EventName : uint8_t
 	{					

@@ -11,6 +11,7 @@ song::song()
 	ppqn = 15360;
 	time_signature.top = 4;
 	time_signature.bottom = 4;
+	play_head = 0;
 }
 	
 //--------------------------------------------------------------------------------------------------
@@ -19,6 +20,13 @@ song::song()
 song::~song()
 {
 }
+
+
+//===============================================================================================================================
+// SONG FUNCTIONS
+//===============================================================================================================================
+
+
 
 //--------------------------------------------------------------------------------------------------
 // SET NAME OF SONG
@@ -36,6 +44,164 @@ string song::get_name()
 {
 	return name;
 }
+
+
+
+
+//==============================================================================================================================
+// TRACK FUNCTIONS
+//==============================================================================================================================
+
+
+
+//---------------------------------------------------------------------------------------
+// CREATE NEW TRACK
+
+int song::create_track(string name)
+{
+	track new_track;
+	new_track.name = name;
+	tracks.push_back(new_track);
+	
+	return tracks.size()-1;
+}
+
+
+//----------------------------------------------------------------------------------------
+// GET TRACK NAME
+
+string song::get_track_name(int track_number)
+{
+	if (track_number > -1 && track_number < tracks.size() ) 
+	{
+		return tracks[track_number].name; 
+	}
+	return NULL;
+}
+
+//----------------------------------------------------------------------------------------
+// GET NUMBER OF TRACKS
+
+int song::get_number_of_tracks()
+{
+	return tracks.size();
+}
+
+
+
+
+//----------------------------------------------------------------------------------------
+// DRAW TRACK DISPLAY
+
+void song::draw_track_display(NVGcontext* vg, int track_number)
+{
+
+	if (track_number < 0 || track_number > tracks.size()) return;
+
+	int x = tracks[track_number].x;
+	int y = tracks[track_number].y;
+	int w = tracks[track_number].w;
+	int h = tracks[track_number].h;
+
+	nvgBeginPath(vg);
+	nvgRect(vg, x,y,w,h);
+	nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0,h, nvgRGBA(255,255,255,255),nvgRGBA(200,200,200,255))); 	
+	nvgFill(vg);
+	
+	nvgBeginPath(vg);
+	nvgRect(vg, x,y,w,h);
+	nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0,h, nvgRGBA(200,200,200,255),nvgRGBA(160,160,160,255))); 
+	nvgFill(vg);
+
+	nvgBeginPath(vg);
+	nvgStrokeColor(vg, nvgRGBA(0,0,0,120));
+	
+	for (int gy=0; gy<h; gy+=16)
+	{
+		nvgMoveTo(vg, x, y+gy);
+		nvgLineTo(vg, x+w, y+gy);
+	}
+	
+	for (int gx=0; gx<w; gx+=8)
+	{
+		nvgMoveTo(vg, x+gx, y);
+		nvgLineTo(vg, x+gx, y+h);
+	}
+	
+	nvgStroke(vg);
+}
+
+
+
+
+
+
+//=================================================================================================================================
+// BLOCK FUNCTIONS
+//==================================================================================================================================
+
+
+//---------------------------------------------------------------------------------------
+// CREATE NEW BLOCK
+int song::create_block(string name,long start, long length)
+{
+	block new_block;
+	new_block.name = name;
+	new_block.volume = 0.75;
+	new_block.start = start;
+	new_block.length = length;
+	blocks.push_back(new_block);
+	return blocks.size()-1;
+}
+
+
+//-----------------------------------------------------------------------------------------
+// CREATE INSTANCE OF BLOCK
+
+bool song::create_block_instance(string name, int block_number, int track_number, int delta_time, bool visible)
+{
+
+	cout << track_number << " - " << block_number << endl;
+	
+	if (track_number < 0 || track_number > tracks.size() ) return false;
+	if (block_number < 0 || block_number > blocks.size() ) return false;
+
+
+	cout << "Create NEW Bloke" << endl;
+	
+	block_instance new_block_instance;
+	new_block_instance.name = name;
+	new_block_instance.block_number = block_number;
+	new_block_instance.delta_time = delta_time;
+	new_block_instance.visible = visible;
+	tracks[track_number].block_instances.push_back(new_block_instance);
+	return true;
+}
+
+//----------------------------------------------------------------------------------------
+
+void song::find_visible_blocks()
+{
+	for (int trk=0; trk < tracks.size(); trk++)
+	{
+	 	for (int blkin = 0; blkin < tracks[trk].block_instances.size(); blkin++)
+		{
+			tracks[trk].block_instances[blkin].visible = false;
+			if (play_head == tracks[trk].block_instances[blkin].delta_time)
+			{
+				tracks[trk].block_instances[blkin].visible = true;
+				cout << "Track: " << trk << " - Block: " << tracks[trk].block_instances[blkin].block_number << " - is visible" << endl;
+			}
+		}
+	}}
+
+
+//=================================================================================================================================
+// MIDI FUNCTIONS
+//==================================================================================================================================
+
+
+
 
 //--------------------------------------------------------------------------------------------------
 // LOAD AND PARSE MIDI FILE
@@ -289,7 +455,9 @@ bool song::load_midi_file(string file_name)
 						std::cout << "Track Name: " << vecTracks[nChunk].sName << std::endl;	
 						current_track = create_track(vecTracks[nChunk].sName);
 						current_block = create_block(vecTracks[nChunk].sName,0,8192);
+						create_block_instance(vecTracks[nChunk].sName, current_block, current_track,0,false);
 						break;
+						
 					case MetaInstrumentName:
 						vecTracks[nChunk].sInstrument = ReadString(nLength);
 						std::cout << "Instrument Name: " << vecTracks[nChunk].sInstrument << std::endl;
@@ -403,95 +571,6 @@ bool song::load_midi_file(string file_name)
 
 
 
-//---------------------------------------------------------------------------------------
-// CREATE NEW TRACK
-
-int song::create_track(string name)
-{
-	track new_track;
-	new_track.name = name;
-	tracks.push_back(new_track);
-	
-	return tracks.size()-1;
-}
-
-
-//---------------------------------------------------------------------------------------
-// CREATE NEW BLOCK
-int song::create_block(string name,long start, long length)
-{
-	block new_block;
-	new_block.name = name;
-	new_block.volume = 0.75;
-	new_block.start = start;
-	new_block.length = length;
-	blocks.push_back(new_block);
-	return blocks.size()-1;
-}
-
-
-//----------------------------------------------------------------------------------------
-// DRAW TRACK DISPLAY
-
-void song::draw_track_display(NVGcontext* vg, int track_number)
-{
-
-	if (track_number < 0 || track_number > tracks.size()) return;
-
-	int x = tracks[track_number].x;
-	int y = tracks[track_number].y;
-	int w = tracks[track_number].w;
-	int h = tracks[track_number].h;
-
-	nvgBeginPath(vg);
-	nvgRect(vg, x,y,w,h);
-	nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0,h, nvgRGBA(255,255,255,255),nvgRGBA(200,200,200,255))); 	
-	nvgFill(vg);
-	
-	nvgBeginPath(vg);
-	nvgRect(vg, x,y,w,h);
-	nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0,h, nvgRGBA(200,200,200,255),nvgRGBA(160,160,160,255))); 
-	nvgFill(vg);
-
-	nvgBeginPath(vg);
-	nvgStrokeColor(vg, nvgRGBA(0,0,0,120));
-	
-	for (int gy=0; gy<h; gy+=16)
-	{
-		nvgMoveTo(vg, x, y+gy);
-		nvgLineTo(vg, x+w, y+gy);
-	}
-	
-	for (int gx=0; gx<w; gx+=8)
-	{
-		nvgMoveTo(vg, x+gx, y);
-		nvgLineTo(vg, x+gx, y+h);
-	}
-	
-	nvgStroke(vg);
-}
-
-
-
-//----------------------------------------------------------------------------------------
-// DRAW TRACK DISPLAY
-
-string song::get_track_name(int track_number)
-{
-	if (track_number > -1 && track_number < tracks.size() ) 
-	{
-		return tracks[track_number].name; 
-	}
-	return NULL;
-}
-
-//----------------------------------------------------------------------------------------
-// GET NUMBER OF TRACKS
-
-int song::get_number_of_tracks()
-{
-	return tracks.size();
-}
 
 
 

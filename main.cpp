@@ -103,6 +103,8 @@ int main()
 	
 	int current_song_track = 0;
 	
+	my_song.find_visible_blocks();
+	
 	//------------ MAIN LOOP
 
 	do

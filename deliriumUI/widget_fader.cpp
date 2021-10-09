@@ -40,7 +40,8 @@ void widget_fader::draw(NVGcontext* vg)
 	float fade_h = h-64;
 	float fade_y = (y+16) + (fade_h * (1-value));
 	nvgBeginPath(vg);
-	nvgFillPaint(vg, nvgLinearGradient(vg, x, fade_y, x, fade_y+32, nvgRGBA(100,100,100,255),nvgRGBA(10,10,10,255))); 
+	if (hover) nvgFillPaint(vg, nvgLinearGradient(vg, x, fade_y, x, fade_y+32, nvgRGBA(130,130,130,255),nvgRGBA(20,20,20,255))); 
+		else nvgFillPaint(vg, nvgLinearGradient(vg, x, fade_y, x, fade_y+32, nvgRGBA(100,100,100,255),nvgRGBA(10,10,10,255))); 
 	nvgRect(vg, x, fade_y, w, 32);
 	nvgFill(vg);	
 
@@ -56,7 +57,7 @@ void widget_fader::draw(NVGcontext* vg)
 	nvgFontFace(vg, "sans");
 	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
 	if (hover) nvgFillColor(vg, nvgRGBA(255,255,255,255));
-		else nvgFillColor(vg, nvgRGBA(200,200,200,255));
+		else nvgFillColor(vg, nvgRGBA(180,180,180,255));
 	float text_width = (font_size/1.75) * text_top.length();
 	nvgText(vg, x + ((w / 2) - (text_width / 2)), y, text_top.c_str(),NULL);
 
