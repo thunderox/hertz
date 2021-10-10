@@ -7,7 +7,7 @@
 
 song::song()
 {
-	tempo = 120;
+	bpm = 120;
 	ppqn = 15360;
 	time_signature.top = 4;
 	time_signature.bottom = 4;
@@ -98,40 +98,23 @@ void song::draw_track_display(NVGcontext* vg, int track_number)
 
 	if (track_number < 0 || track_number > tracks.size()) return;
 
+	nvgStrokeWidth(vg, 1);	
+
 	int x = tracks[track_number].x;
 	int y = tracks[track_number].y;
 	int w = tracks[track_number].w;
 	int h = tracks[track_number].h;
 
 	nvgBeginPath(vg);
-	nvgRect(vg, x,y,w,h);
-	nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0,h, nvgRGBA(255,255,255,255),nvgRGBA(200,200,200,255))); 	
-	nvgFill(vg);
-	
-	nvgBeginPath(vg);
-	nvgRect(vg, x,y,w,h);
-	nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0,h, nvgRGBA(200,200,200,255),nvgRGBA(160,160,160,255))); 
+	nvgFillPaint(vg, nvgLinearGradient(vg, x,y,x+w,y, nvgRGBA(50,50,80,255),nvgRGBA(30,30,50,255))); 
+	nvgRect(vg, x,y,w,h);	
 	nvgFill(vg);
 
 	nvgBeginPath(vg);
 	nvgStrokeColor(vg, nvgRGBA(0,0,0,120));
 	
-	for (int gy=0; gy<h; gy+=16)
-	{
-		nvgMoveTo(vg, x, y+gy);
-		nvgLineTo(vg, x+w, y+gy);
-	}
+	int quarter_2_pixels = (bpm / 8);	
 	
-	for (int gx=0; gx<w; gx+=8)
-	{
-		nvgMoveTo(vg, x+gx, y);
-		nvgLineTo(vg, x+gx, y+h);
-	}
-	
-	int bx=8;
-	int by=16;
-	int bw = 7;
-	float note_width = (180/128) * 2;
 	int delta = 0;
 	
 	int note_on_delta[128];
@@ -140,10 +123,9 @@ void song::draw_track_display(NVGcontext* vg, int track_number)
 		note_on_delta[x] = -1;
 	}
 	
-	nvgStroke(vg);
+	float zoom_y = 8;
 	
-	nvgBeginPath(vg);
-	nvgFillColor(vg, nvgRGBA(0,0,0,255));
+	nvgFillColor(vg, nvgRGBA(200,200,200,255));
 	
 	for (int blkin = 0; blkin < tracks[track_number].block_instances.size(); blkin++)
 	{
@@ -154,38 +136,86 @@ void song::draw_track_display(NVGcontext* vg, int track_number)
 			int event_type = blocks[block_number].events[ev].event_type;
 			int note = blocks[block_number].events[ev].note;
 			delta += blocks[block_number].events[ev].delta;
+			if (delta / 16 > h) break;	
 				
-				if (note > -1 && note < 128)
-				{	
-				
+			if (note > -1 && note < 128)
+			{	
+			
 				if (event_type == block_event_type_note_on)
 				{
-					note_on_delta[note] = delta / by;
-				}
-					
-				if (event_type == block_event_type_note_off && note_on_delta[note] == -1)
-				{
-					note_on_delta[note] = -1;
+					note_on_delta[note] = delta;
 				}
 					
 				if (event_type == block_event_type_note_off && note_on_delta[note] != -1)
 				{
-					float note_x_pos = ((float)note / w) * bw;
-					nvgRect(vg, x+note_x_pos, y+ (note_on_delta[note] - track_scroll_y) ,note_width, (delta/by) - note_on_delta[note]);
+					float note_x_pos = x + ((float)note * ((float)w / 128.0f));
+					int note_y_pos = y + (note_on_delta[note] / zoom_y);
+					int note_height = (delta / zoom_y)  - (note_on_delta[note]/zoom_y);
+					nvgBeginPath(vg);
+					nvgRect(vg, note_x_pos, note_y_pos, ((float)w / 128.0f), note_height);
 					nvgFill(vg);
 					note_on_delta[note] = -1;
+					
 				}
 			}
-			if (note_on_delta[note]-track_scroll_y > 700) break;
+		}
 			
+		if (y + (delta/zoom_y) < y+h)
+		{
+			nvgBeginPath(vg);
+			nvgFillColor(vg, nvgRGBA(150,150,150,255));
+			nvgRect(vg, x, y + (delta/zoom_y), w, 1);
+			nvgFill(vg);
 		}
 	}
-		
 	
+	nvgBeginPath(vg);
+	nvgFillColor(vg, nvgRGBA(0,0,0,255));
+	for (int gy=0; gy<h; gy+=quarter_2_pixels)
+	{
+		nvgMoveTo(vg, x, y+gy);
+		nvgLineTo(vg, x+w, y+gy);
+	}
+	
+	float octave_width = (float)w / (128.0f / 12.0f);
+	
+	cout << w << " - " << octave_width << endl;
+	
+	for (int gx=0; gx<w; gx+=octave_width)
+	{
+		nvgMoveTo(vg, x+gx, y);
+		nvgLineTo(vg, x+gx, y+h);
+	}
+	
+	nvgStroke(vg);
+	nvgEndFrame(vg);
 }
 
 
+//----------------------------------------------------------------------------------------
+// DRAW TRACK LEVEL METER
 
+void song::draw_track_level_meter (NVGcontext* vg, int track_number)
+{
+	if (track_number < 0 || track_number > tracks.size()) return;
+	
+	int x = tracks[track_number].x;
+	int y = tracks[track_number].y;
+	int w = tracks[track_number].w;
+	int h = tracks[track_number].h;
+	
+	nvgBeginPath(vg);
+	nvgFillColor(vg, nvgRGBA(0,0,0,255));
+	nvgRect(vg, x + (w/2), y - 280, 32, 140);
+	nvgFill(vg);
+	
+	nvgBeginPath(vg);
+	nvgFillColor(vg, nvgRGBA(255,0,0,255));
+	nvgRect(vg, x + (w/2), y - 280, 8, 140);
+	nvgRect(vg, x + 16 + (w/2), y - 280, 8, 140);
+	nvgFill(vg);
+	nvgEndFrame(vg);
+}
 
 
 
@@ -214,13 +244,10 @@ int song::create_block(string name,long start, long length)
 bool song::create_block_instance(string name, int block_number, int track_number, int delta_time, bool visible)
 {
 
-	cout << track_number << " - " << block_number << endl;
 	
 	if (track_number < 0 || track_number > tracks.size() ) return false;
 	if (block_number < 0 || block_number > blocks.size() ) return false;
 
-
-	cout << "Create NEW Bloke" << endl;
 	
 	block_instance new_block_instance;
 	new_block_instance.name = name;
@@ -243,7 +270,6 @@ void song::find_visible_blocks()
 			if (play_head == tracks[trk].block_instances[blkin].delta_time)
 			{
 				tracks[trk].block_instances[blkin].visible = true;
-				cout << "Track: " << trk << " - Block: " << tracks[trk].block_instances[blkin].block_number << " - is visible" << endl;
 			}
 		}
 	}}
@@ -538,7 +564,7 @@ bool song::load_midi_file(string file_name)
 							(m_nTempo |= (ifs.get() << 8));
 							(m_nTempo |= (ifs.get() << 0));
 							m_nBPM = (60000000 / m_nTempo);
-							tempo = m_nBPM;
+							bpm = m_nBPM;
 							std::cout << "Tempo: " << m_nTempo << " (" << m_nBPM << "bpm)" << std::endl;
 						}
 						break;
@@ -546,7 +572,9 @@ bool song::load_midi_file(string file_name)
 						std::cout << "SMPTE: H:" << ifs.get() << " M:" << ifs.get() << " S:" << ifs.get() << " FR:" << ifs.get() << " FF:" << ifs.get() << std::endl;
 						break;
 					case MetaTimeSignature:
-						std::cout << "Time Signature: " << ifs.get() << "/" << (2 << ifs.get()) << std::endl;
+						time_signature.top = ifs.get();
+						time_signature.bottom = 2 << ifs.get();
+						std::cout << "Time Signature: " << time_signature.top << "/" << time_signature.bottom << std::endl;
 						std::cout << "ClocksPerTick: " << ifs.get() << std::endl;
 
 						// A MIDI "Beat" is 24 ticks, so specify how many 32nd notes constitute a beat

@@ -34,14 +34,14 @@ int main()
 	my_song.window_height = main_gui.screen_height;
 	my_song.set_name("This is my first ever song");
 	
-	my_song.load_midi_file("test4.mid");
+	my_song.load_midi_file("nixmidi.mid");
 	
 	std::stringstream ss;
 	int song_track_widget_number[256];
 	
 	for (int trk=0; trk < my_song.get_number_of_tracks(); trk++)
 	{
-		int widget_grid_edit = main_gui.create_widget(widget_type_grid, win, (trk*3.25)+4, 16, 3.2, 24, "");
+		int widget_grid_edit = main_gui.create_widget(widget_type_grid, win, ((trk+1)*3.25)+4, 16, 3.2, 24, "");
 		song_track_widget_number[widget_grid_edit] = trk;
 		
 		my_song.tracks[trk].x = main_gui.windows[win].widgets[widget_grid_edit]->x;
@@ -56,16 +56,18 @@ int main()
 	
 
 	
-	for (int tr=1; tr < my_song.get_number_of_tracks(); tr++)
-	{	ss.str("");
-		ss << tr;
-		main_gui.create_widget(widget_type_button, win, (tr*3.25)+4, 1, 3, 1, my_song.get_track_name(tr));
+	for (int trk=0; trk < my_song.get_number_of_tracks(); trk++)
+	{	
+		int track_x_pos = 4 + (trk+1) * 3.25;
+		ss.str("");
+		ss << trk;
+		main_gui.create_widget(widget_type_button, win, track_x_pos, 1, 3, 1, my_song.get_track_name(trk));
 		
-		int fader_widget_number = main_gui.create_widget(widget_type_fader, win, (tr*3.25)+4, 2.25, 1.5, 8, ss.str());
+		int fader_widget_number = main_gui.create_widget(widget_type_fader, win,track_x_pos, 2.25, 1.5, 8, ss.str());
 		main_gui.windows[win].widgets[fader_widget_number]->set_value(0.5);
 		main_gui.windows[win].widgets[fader_widget_number]->set_default_value(0.5);
 		
-		int pan_widget_number = main_gui.create_widget(widget_type_knob, win, (tr*3.25)+4.5, 11, 2,3, "PAN");
+		int pan_widget_number = main_gui.create_widget(widget_type_knob, win, track_x_pos, 11, 2,3, "PAN");
 		main_gui.windows[win].widgets[pan_widget_number]->set_value(0.5);
 		main_gui.windows[win].widgets[pan_widget_number]->set_default_value(0.5);
 	}
@@ -87,6 +89,9 @@ int main()
 	for (int trk=0; trk<my_song.get_number_of_tracks(); trk++)
 	{
 		my_song.draw_track_display(vg, trk);
+		
+		my_song.draw_track_level_meter(vg, trk);
+		glfwSwapBuffers(main_gui.windows[current_window].window);
 	}
 
 	nvgEndFrame(vg);
@@ -95,8 +100,11 @@ int main()
 	main_gui.display_all();
 	for (int trk=0; trk<my_song.get_number_of_tracks(); trk++)
 	{
-
 		my_song.draw_track_display(vg, trk);
+		
+		my_song.draw_track_level_meter(vg, trk);
+		nvgEndFrame(vg);
+		glfwSwapBuffers(main_gui.windows[current_window].window);
 	}
 	nvgEndFrame(vg);
 	glfwSwapBuffers(main_gui.windows[current_window].window);
@@ -104,6 +112,7 @@ int main()
 	int current_song_track = 0;
 	
 	my_song.find_visible_blocks();
+	
 	
 	//------------ MAIN LOOP
 
@@ -115,7 +124,7 @@ int main()
 		{		
 			old_time = glfwGetTime();
 			main_gui.main_loop();
-			
+						
 			int current_widget = main_gui.windows[current_window].current_widget;
 								
 			if (main_gui.windows[current_window].widget_draw)

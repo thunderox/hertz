@@ -48,6 +48,8 @@ typedef struct
 {
 	string name;
 	float volume;
+	float* audio_left;
+	float* audio_right;
 	
 	int x,y,w,h;
 	
@@ -97,7 +99,7 @@ class song
 	
 	int sample_rate;
 	int ppqn;
-	int tempo;
+	int bpm;
 	
 	vector <track> tracks;
 	vector <block> blocks;
@@ -108,12 +110,16 @@ class song
 	int play_head;
 	int track_scroll_y;
 	
+	string name;
+	struct_time_signature time_signature;
+	
 	// TRACKS ----------------------------------	
 
 	int create_track(string);	
 	string get_track_name(int);
 	int get_number_of_tracks();
 	void draw_track_display(NVGcontext*, int);
+	void draw_track_level_meter (NVGcontext*, int);
 
 	// BLOCKS -----------------------------------------
 
@@ -192,9 +198,6 @@ class song
 	
 	private:
 	
-	string name;
-	struct_time_signature time_signature;
-
 	
 };
 
