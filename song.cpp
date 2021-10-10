@@ -129,7 +129,7 @@ void song::draw_track_display(NVGcontext* vg, int track_number)
 	}
 	
 	int bx=8;
-	int by=32;
+	int by=16;
 	int bw = 7;
 	float note_width = (180/128) * 2;
 	int delta = 0;
@@ -176,6 +176,7 @@ void song::draw_track_display(NVGcontext* vg, int track_number)
 					note_on_delta[note] = -1;
 				}
 			}
+			if (note_on_delta[note]-track_scroll_y > 700) break;
 			
 		}
 	}
