@@ -119,7 +119,6 @@ class song
 	string get_track_name(int);
 	int get_number_of_tracks();
 	void draw_track_display(NVGcontext*, int);
-	void draw_track_level_meter (NVGcontext*, int);
 
 	// BLOCKS -----------------------------------------
 

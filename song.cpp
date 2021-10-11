@@ -136,7 +136,7 @@ void song::draw_track_display(NVGcontext* vg, int track_number)
 			int event_type = blocks[block_number].events[ev].event_type;
 			int note = blocks[block_number].events[ev].note;
 			delta += blocks[block_number].events[ev].delta;
-			if (delta / 16 > h) break;	
+			if (delta / zoom_y > h) break;	
 				
 			if (note > -1 && note < 128)
 			{	
@@ -177,43 +177,15 @@ void song::draw_track_display(NVGcontext* vg, int track_number)
 		nvgLineTo(vg, x+w, y+gy);
 	}
 	
-	float octave_width = (float)w / (128.0f / 12.0f);
+	float octave_width = (float)w / (128.0 / 12.0);
 	
-	cout << w << " - " << octave_width << endl;
-	
-	for (int gx=0; gx<w; gx+=octave_width)
+	for (float gx=0; gx<w; gx+=octave_width)
 	{
 		nvgMoveTo(vg, x+gx, y);
 		nvgLineTo(vg, x+gx, y+h);
 	}
 	
 	nvgStroke(vg);
-	nvgEndFrame(vg);
-}
-
-
-//----------------------------------------------------------------------------------------
-// DRAW TRACK LEVEL METER
-
-void song::draw_track_level_meter (NVGcontext* vg, int track_number)
-{
-	if (track_number < 0 || track_number > tracks.size()) return;
-	
-	int x = tracks[track_number].x;
-	int y = tracks[track_number].y;
-	int w = tracks[track_number].w;
-	int h = tracks[track_number].h;
-	
-	nvgBeginPath(vg);
-	nvgFillColor(vg, nvgRGBA(0,0,0,255));
-	nvgRect(vg, x + (w/2), y - 280, 32, 140);
-	nvgFill(vg);
-	
-	nvgBeginPath(vg);
-	nvgFillColor(vg, nvgRGBA(255,0,0,255));
-	nvgRect(vg, x + (w/2), y - 280, 8, 140);
-	nvgRect(vg, x + 16 + (w/2), y - 280, 8, 140);
-	nvgFill(vg);
 	nvgEndFrame(vg);
 }
 
