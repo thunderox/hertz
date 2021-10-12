@@ -34,7 +34,7 @@ int main()
 	my_song.window_height = main_gui.screen_height;
 	my_song.set_name("This is my first ever song");
 	
-	my_song.load_midi_file("octaves.mid");
+	my_song.load_midi_file("nixmidi.mid");
 	
 	std::stringstream ss;
 	int song_track_widget_number[256];
@@ -58,7 +58,7 @@ int main()
 	
 	for (int trk=0; trk < my_song.get_number_of_tracks(); trk++)
 	{	
-		int track_x_pos = 4 + (trk+1) * 3.25;
+		float track_x_pos = 4 + (trk+1) * 3.25;
 		ss.str("");
 		ss << trk;
 		main_gui.create_widget(widget_type_button, win, track_x_pos, 1, 3, 1, my_song.get_track_name(trk));

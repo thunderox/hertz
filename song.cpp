@@ -130,12 +130,18 @@ void song::draw_track_display(NVGcontext* vg, int track_number)
 	for (int blkin = 0; blkin < tracks[track_number].block_instances.size(); blkin++)
 	{
 		int block_number = tracks[track_number].block_instances[blkin].block_number;
-	
+		
+		int delta_start = blocks[block_number].events[0].delta /zoom_y;
+		int delta_end = 0;
+
+		nvgBeginPath(vg);
+		nvgFillColor(vg, nvgRGBA(200,200,200,255));	
 		for (int ev=0; ev<blocks[block_number].events.size(); ev++)
 		{	
 			int event_type = blocks[block_number].events[ev].event_type;
 			int note = blocks[block_number].events[ev].note;
 			delta += blocks[block_number].events[ev].delta;
+			delta_end = delta / zoom_y;
 			if (delta / zoom_y > h) break;	
 				
 			if (note > -1 && note < 128)
@@ -163,10 +169,21 @@ void song::draw_track_display(NVGcontext* vg, int track_number)
 		if (y + (delta/zoom_y) < y+h)
 		{
 			nvgBeginPath(vg);
+			nvgFillColor(vg, nvgRGBA(255,255,255,32));
+			nvgRect(vg, x, y + (delta_start/zoom_y), w, delta_end - delta_start);
+			nvgFill(vg);
+			
+			nvgBeginPath(vg);
 			nvgFillColor(vg, nvgRGBA(150,150,150,255));
-			nvgRect(vg, x, y + (delta/zoom_y), w, 1);
+			nvgRect(vg, x, y + delta_start, w, 2);
+			nvgFill(vg);
+			
+			nvgBeginPath(vg);
+			nvgFillColor(vg, nvgRGBA(150,150,150,255));
+			nvgRect(vg, x, y + delta_end, w, 2);
 			nvgFill(vg);
 		}
+
 	}
 	
 	nvgBeginPath(vg);

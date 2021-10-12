@@ -247,8 +247,12 @@ void deliriumUI::display_all()
 		for (int x=0; x<windows[current_window].widgets.size(); x++)
 		{
 			nvgBeginPath(vg);
-			nvgScissor(vg, windows[current_window].widgets[x]->x, windows[current_window].widgets[x]->y, windows[current_window].widgets[x]->w, windows[current_window].widgets[x]->h);
+			nvgScissor(vg, windows[current_window].widgets[x]->x, windows[current_window].widgets[x]->y,
+				windows[current_window].widgets[x]->w, windows[current_window].widgets[x]->h);
+				
 			windows[current_window].widgets[x]->draw(vg);
+						
+			nvgScissor(vg, 0, 0, screen_width, screen_height);
 		}
 		nvgEndFrame(vg);
 	}
@@ -346,7 +350,7 @@ int deliriumUI::create_widget(int type, int win, float x, float y, float w, floa
 	
 	if (type == widget_type_level)
 	{
-		new_widget = new widget_grid();
+		new_widget = new widget_level();
 		new_widget->type = widget_type_level;
 		new_widget_created = true;
 	}
