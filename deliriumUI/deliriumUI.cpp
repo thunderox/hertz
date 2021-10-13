@@ -8,6 +8,10 @@ bool mouse_left_released = false;
 bool mouse_middle_button_pressed = false;
 bool mouse_middle_button_released = false;
 float mouse_scroll_y = 0;
+bool window_gained_focus;
+bool window_resized;
+int window_resized_width;
+int window_resized_height;
 
 //----------------------------------------------------------------------------------------------
 
@@ -34,6 +38,30 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 
 //----------------------------------------------------------------------------------------------
 
+void window_resize_callback(GLFWwindow* window, int width, int height)
+{
+	window_resized = true;
+	window_resized_width = width;
+	window_resized_height = height;
+}
+
+//----------------------------------------------------------------------------------------------
+
+
+void window_focus_callback(GLFWwindow* window, int focused)
+{
+    if (focused)
+    {
+	window_gained_focus = true;
+    }
+    else
+    {
+    	window_gained_focus = false;
+    }
+}
+
+//----------------------------------------------------------------------------------------------
+
 deliriumUI::deliriumUI()
 {
 	if (!glfwInit())
@@ -47,7 +75,7 @@ deliriumUI::deliriumUI()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL 
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
 	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
@@ -97,6 +125,7 @@ int deliriumUI::create_window(int x, int y, int width, int height, string title)
 	
 	new_window.current_widget = -1;
 	new_window.draw_all = true;
+	new_window.window_gained_focus = true;
 	
 	windows.push_back(new_window);
 	return windows.size()-1;
@@ -150,9 +179,28 @@ int deliriumUI::main_loop()
 		NVGcontext* vg = windows[current_window].vg; 
 		glfwSetMouseButtonCallback(window, mouse_button_callback);
 		glfwSetScrollCallback(window, scroll_callback);
+		glfwSetWindowFocusCallback(window, window_focus_callback);
+		glfwSetFramebufferSizeCallback(window, window_resize_callback); 
 			
 			glfwWaitEventsTimeout(0.25);
 			
+				if (window_gained_focus)
+				{
+					window_gained_focus = false;
+					windows[current_window].window_gained_focus = true;
+				}
+				
+				if (window_resized)
+				{
+					cout << "bugoff" << endl;
+					window_resized = false;
+					screen_width = window_resized_width;
+					screen_height = window_resized_height;
+					winWidth = window_resized_width;
+					winHeight = window_resized_height;
+					recalc_widget_dimensions(current_window);
+					windows[current_window].window_resized = true;
+				}
 
 				glfwGetCursorPos(window, &mx, &my);
 
@@ -238,7 +286,6 @@ void deliriumUI::display_all()
 	if (current_window > -1 && current_window < windows.size())
 	{
 		NVGcontext* vg = windows[current_window].vg;
-		nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
 		nvgBeginPath(vg);
 		nvgRect(vg, 0,0,screen_width,screen_height);
 		nvgFillPaint(vg, nvgRadialGradient(vg, screen_width/2, screen_height/2,600,1000, nvgRGBA(20,20,20,255),nvgRGBA(5,5,5,255))); 
@@ -254,7 +301,6 @@ void deliriumUI::display_all()
 						
 			nvgScissor(vg, 0, 0, screen_width, screen_height);
 		}
-		nvgEndFrame(vg);
 	}
 	
 }
@@ -269,8 +315,6 @@ void deliriumUI::refresh_widgets(int window)
 	if (current_window > -1 && current_window < windows.size())
 	{
 		NVGcontext* vg = windows[current_window].vg;
-		nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
-
 		nvgBeginPath(vg);
 		nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0, screen_height/2, nvgRGBA(40,40,40,255),nvgRGBA(10,10,10,255)));
 		for (int x=0; x<windows[window].widgets.size(); x++)
@@ -293,7 +337,6 @@ void deliriumUI::refresh_widgets(int window)
 				windows[current_window].widgets[x]->draw(vg);
 			}			
 		}
-	nvgEndFrame(vg);
 	}
 	
 }
@@ -302,6 +345,8 @@ void deliriumUI::refresh_widgets(int window)
 
 int deliriumUI::create_widget(int type, int win, float x, float y, float w, float h, string text_top)
 {
+
+	if (win < 0 || win > windows.size()) return -1;
 
 	widget* new_widget = NULL;
 	bool new_widget_created = false;
@@ -357,6 +402,12 @@ int deliriumUI::create_widget(int type, int win, float x, float y, float w, floa
 	
 	if (new_widget_created)
 	{
+		new_widget->g_x = x;
+		new_widget->g_y = y;
+		new_widget->g_w = w;
+		new_widget->g_h = h;
+		
+		
 		new_widget->x = x * windows[win].snapx;
 		new_widget->y = y * windows[win].snapy;
 		new_widget->w = (w * windows[win].snapx)-1;
@@ -370,6 +421,27 @@ int deliriumUI::create_widget(int type, int win, float x, float y, float w, floa
 	}
 	
 	return -1;
+}
+
+
+void deliriumUI::recalc_widget_dimensions(int win)
+{
+	if (win < 0 || win > windows.size()) return;
+	
+	cout << "SPUDULICA" << endl;
+	windows[win].snapx = screen_width / gridx;
+	windows[win].snapy = screen_height / gridy;
+	
+	
+	for (int w=0; w<windows[win].widgets.size(); w++)
+	{
+		windows[win].widgets[w]->x = windows[win].widgets[w]->g_x * windows[win].snapx;
+		windows[win].widgets[w]->y = windows[win].widgets[w]->g_y * windows[win].snapy;
+		windows[win].widgets[w]->w = (windows[win].widgets[w]->g_w * windows[win].snapx)-1;
+		windows[win].widgets[w]->h = (windows[win].widgets[w]->g_h * windows[win].snapy)-1;
+		
+		cout << windows[win].widgets[w]->x  << endl;
+	}
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------

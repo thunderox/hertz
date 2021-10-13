@@ -53,8 +53,8 @@ class deliriumUI
 	int mouse_over(int,int);
 	void display_all();
 	void refresh_widgets(int);
-	
 	int create_widget(int,int,float,float,float,float,string);
+	void recalc_widget_dimensions(int);
 	
 	int screen_width, screen_height;
 	string window_title;
@@ -70,9 +70,13 @@ class deliriumUI
 		float gridx,gridy,snapx,snapy;
 		vector <widget*> widgets;
 		int current_widget;
+		bool window_gained_focus;
+		bool window_resized;
 	};
 	
 	vector <delirium_window> windows;
+	
+	float pxRatio;
 	
 	private:
 		
@@ -80,7 +84,7 @@ class deliriumUI
 	int font;
 	int winWidth, winHeight;
 	int fbWidth, fbHeight;
-	float pxRatio;
+
 };
 
 #endif

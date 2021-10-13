@@ -95,7 +95,6 @@ int song::get_number_of_tracks()
 
 void song::draw_track_display(NVGcontext* vg, int track_number)
 {
-
 	if (track_number < 0 || track_number > tracks.size()) return;
 
 	nvgStrokeWidth(vg, 1);	
@@ -203,7 +202,6 @@ void song::draw_track_display(NVGcontext* vg, int track_number)
 	}
 	
 	nvgStroke(vg);
-	nvgEndFrame(vg);
 }
 
 

@@ -13,6 +13,7 @@ widget::widget()
 	old_mx = -1;
 	old_my = -1;
 	redraw = false;
+	parent_widget = -1; // THIS IS A STRONG SELF RELIANT INDEPENDENT WIDGET - WELL BY DEFAULT ANYWAY 
 }
 
 //----------------------------------------------------------------------------------------------

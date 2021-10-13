@@ -34,7 +34,7 @@ int main()
 	my_song.window_height = main_gui.screen_height;
 	my_song.set_name("This is my first ever song");
 	
-	my_song.load_midi_file("nixmidi.mid");
+	my_song.load_midi_file("test5.mid");
 	
 	std::stringstream ss;
 	int song_track_widget_number[256];
@@ -85,29 +85,17 @@ int main()
 	
 	float old_time = 0;
 
-	// UPDATE GUI DISPLAY TWICE BEFORE MAIN LOOP - Needed on some systems or back buffer is blank when swapped to front.
-
-
+	nvgBeginFrame(vg, main_gui.screen_width, main_gui.screen_height, main_gui.pxRatio);
 	main_gui.display_all();
+	
 	for (int trk=0; trk<my_song.get_number_of_tracks(); trk++)
 	{
 		my_song.draw_track_display(vg, trk);
 		glfwSwapBuffers(main_gui.windows[current_window].window);
 	}
-
 	nvgEndFrame(vg);
 	glfwSwapBuffers(main_gui.windows[current_window].window);
-	
-	main_gui.display_all();
-	for (int trk=0; trk<my_song.get_number_of_tracks(); trk++)
-	{
-		my_song.draw_track_display(vg, trk);
-		nvgEndFrame(vg);
-		glfwSwapBuffers(main_gui.windows[current_window].window);
-	}
-	nvgEndFrame(vg);
-	glfwSwapBuffers(main_gui.windows[current_window].window);
-	
+		
 	int current_song_track = 0;
 	
 	my_song.find_visible_blocks();
@@ -118,6 +106,33 @@ int main()
 	do
 	{
 		glfwWaitEventsTimeout(0.01);
+
+		if (main_gui.windows[current_window].window_gained_focus)
+		{
+			main_gui.windows[current_window].draw_all = true; // WINDOW GAINS FOCUS DRAW EVERYTHING AGAIN
+			main_gui.windows[current_window].window_gained_focus = false;
+		}
+		
+		if (main_gui.windows[current_window].window_resized)
+		{
+			main_gui.windows[current_window].draw_all = true;  // WINDOW GAINS FOCUS DRAW EVERYTHING AGAIN AT NEW WINDOW DIMENSIONS
+			main_gui.windows[current_window].window_resized = false;
+		}
+		
+		if (main_gui.windows[current_window].draw_all)  // AN EVENT REQUIRING ALL OF THE WINDOW TO BE REDRAW HAS OCCURRED
+		{
+			main_gui.windows[current_window].draw_all = false;
+			nvgBeginFrame(vg, main_gui.screen_width, main_gui.screen_height, main_gui.pxRatio);
+			main_gui.display_all();
+	
+			for (int trk=0; trk<my_song.get_number_of_tracks(); trk++)
+			{
+				my_song.draw_track_display(vg, trk);
+				glfwSwapBuffers(main_gui.windows[current_window].window);
+			}
+			nvgEndFrame(vg);
+			glfwSwapBuffers(main_gui.windows[current_window].window);
+		}
 
 		if (glfwGetTime() - old_time > 0.01)
 		{		

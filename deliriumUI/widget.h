@@ -45,7 +45,9 @@ class widget
 	int* screen_width;
 	int* screen_height;
 	bool redraw;
+	int parent_widget;
 	float x,y,w,h;
+	float g_x, g_y, g_w, g_h;
 	bool hover;
 	int type;
 	float value;

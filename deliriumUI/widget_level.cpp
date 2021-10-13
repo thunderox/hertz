@@ -8,6 +8,12 @@
 void widget_level::draw(NVGcontext* vg)
 {
 
+
+	nvgBeginPath(vg);
+	nvgFillColor(vg, nvgRGBA(24,24,24,255));
+	nvgRect(vg, x, y, w, h);
+	nvgFill(vg);
+
 	int number_of_leds = 20;
 	int draw_led_counter = number_of_leds;
 	int y_inc = (float)h / number_of_leds;
