@@ -43,6 +43,21 @@ void window_resize_callback(GLFWwindow* window, int width, int height)
 	window_resized = true;
 	window_resized_width = width;
 	window_resized_height = height;
+	
+	if (width < 800)
+	{
+		cout << width << endl;
+		width = 800;
+		glfwSetWindowSize(window, width, height);
+	}
+	
+	if (height < 800)
+	{
+		height = 800;
+		glfwSetWindowSize(window, width, height);
+	}
+	
+	
 }
 
 //----------------------------------------------------------------------------------------------
@@ -192,12 +207,12 @@ int deliriumUI::main_loop()
 				
 				if (window_resized)
 				{
-					cout << "bugoff" << endl;
 					window_resized = false;
 					screen_width = window_resized_width;
 					screen_height = window_resized_height;
 					winWidth = window_resized_width;
 					winHeight = window_resized_height;
+					glViewport( 0, 0, winWidth, winHeight);
 					recalc_widget_dimensions(current_window);
 					windows[current_window].window_resized = true;
 				}
@@ -428,10 +443,8 @@ void deliriumUI::recalc_widget_dimensions(int win)
 {
 	if (win < 0 || win > windows.size()) return;
 	
-	cout << "SPUDULICA" << endl;
-	windows[win].snapx = screen_width / gridx;
-	windows[win].snapy = screen_height / gridy;
-	
+	windows[win].snapx = screen_width / windows[win].gridx;
+	windows[win].snapy = screen_height / windows[win].gridy;
 	
 	for (int w=0; w<windows[win].widgets.size(); w++)
 	{
@@ -439,8 +452,6 @@ void deliriumUI::recalc_widget_dimensions(int win)
 		windows[win].widgets[w]->y = windows[win].widgets[w]->g_y * windows[win].snapy;
 		windows[win].widgets[w]->w = (windows[win].widgets[w]->g_w * windows[win].snapx)-1;
 		windows[win].widgets[w]->h = (windows[win].widgets[w]->g_h * windows[win].snapy)-1;
-		
-		cout << windows[win].widgets[w]->x  << endl;
 	}
 }
 

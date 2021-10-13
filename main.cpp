@@ -38,16 +38,18 @@ int main()
 	
 	std::stringstream ss;
 	int song_track_widget_number[256];
+	int widget_grid_edit[1024];
 	
 	for (int trk=0; trk < my_song.get_number_of_tracks(); trk++)
 	{
-		int widget_grid_edit = main_gui.create_widget(widget_type_grid, win, ((trk+1)*3.25)+4, 16, 3.2, 24, "");
-		song_track_widget_number[widget_grid_edit] = trk;
+		int wid = main_gui.create_widget(widget_type_grid, win, ((trk+1)*3.25)+4, 16, 3.2, 24, "");
 		
-		my_song.tracks[trk].x = main_gui.windows[win].widgets[widget_grid_edit]->x;
-		my_song.tracks[trk].y = main_gui.windows[win].widgets[widget_grid_edit]->y;
-		my_song.tracks[trk].w = main_gui.windows[win].widgets[widget_grid_edit]->w;
-		my_song.tracks[trk].h = main_gui.windows[win].widgets[widget_grid_edit]->h;
+		my_song.tracks[trk].x = main_gui.windows[win].widgets[wid]->x;
+		my_song.tracks[trk].y = main_gui.windows[win].widgets[wid]->y;
+		my_song.tracks[trk].w = main_gui.windows[win].widgets[wid]->w;
+		my_song.tracks[trk].h = main_gui.windows[win].widgets[wid]->h;
+		
+		widget_grid_edit[trk] = wid;
 	}
 
 	
@@ -126,7 +128,11 @@ int main()
 			main_gui.display_all();
 	
 			for (int trk=0; trk<my_song.get_number_of_tracks(); trk++)
-			{
+			{			
+				my_song.tracks[trk].x = main_gui.windows[current_window].widgets[widget_grid_edit[trk]]->x;
+				my_song.tracks[trk].y = main_gui.windows[current_window].widgets[widget_grid_edit[trk]]->y;
+				my_song.tracks[trk].w = main_gui.windows[current_window].widgets[widget_grid_edit[trk]]->w;
+				my_song.tracks[trk].h = main_gui.windows[current_window].widgets[widget_grid_edit[trk]]->h;
 				my_song.draw_track_display(vg, trk);
 				glfwSwapBuffers(main_gui.windows[current_window].window);
 			}
