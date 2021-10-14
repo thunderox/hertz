@@ -54,9 +54,10 @@ int main()
 
 	
 	int panel_mixer = main_gui.create_widget(widget_type_panel, win, 1,0.5, 42,14, "MIXER");
-	int panel_editor = main_gui.create_widget(widget_type_panel, win, 44,0.5, 20,30, "EDITOR");
+	int panel_editor = main_gui.create_widget(widget_type_panel, win, 50,0.5, 10,30, "EDITOR");
 	
-
+	int child_widget = main_gui.create_widget(widget_type_button, win, 0, 0, 4, 1, "PICKY");
+	main_gui.set_widget_parent(win, child_widget, panel_editor);
 	
 	for (int trk=0; trk < my_song.get_number_of_tracks(); trk++)
 	{	

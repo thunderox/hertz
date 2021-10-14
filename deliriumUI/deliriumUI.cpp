@@ -274,8 +274,19 @@ int deliriumUI::mouse_over(int mx, int my)
 
 	for (int x=0; x<windows[current_window].widgets.size(); x++)
 	{
-		test_rect.setX(windows[current_window].widgets[x]->x );
-		test_rect.setY(windows[current_window].widgets[x]->y );
+	
+		int parent = windows[current_window].widgets[x]->parent;
+		int px = 0;
+		int py = 0;
+		
+		if (parent > -1) 
+		{
+			px = windows[current_window].widgets[x]->x;
+			px = windows[current_window].widgets[x]->y;
+		}
+		
+		test_rect.setX(windows[current_window].widgets[x]->x + px );
+		test_rect.setY(windows[current_window].widgets[x]->y + py);
 		test_rect.setWidth(windows[current_window].widgets[x]->w );
 		test_rect.setHeight(windows[current_window].widgets[x]->h );
 
@@ -310,8 +321,18 @@ void deliriumUI::display_all()
 
 		for (int x=0; x<windows[current_window].widgets.size(); x++)
 		{
+			int parent = windows[current_window].widgets[x]->parent;
+			int px = 0;
+			int py = 0;
+		
+			if (parent > -1) 
+			{
+				px = windows[current_window].widgets[x]->x;
+				px = windows[current_window].widgets[x]->y;
+			}
+		
 			nvgBeginPath(vg);
-			nvgScissor(vg, windows[current_window].widgets[x]->x, windows[current_window].widgets[x]->y,
+			nvgScissor(vg, windows[current_window].widgets[x]->x + px, windows[current_window].widgets[x]->y + py,
 				windows[current_window].widgets[x]->w, windows[current_window].widgets[x]->h);
 				
 			windows[current_window].widgets[x]->draw(vg);
@@ -440,6 +461,7 @@ int deliriumUI::create_widget(int type, int win, float x, float y, float w, floa
 	return -1;
 }
 
+//-------------------------------------------------------------------------------------------------------------------------------------------
 
 void deliriumUI::recalc_widget_dimensions(int win)
 {
@@ -455,6 +477,16 @@ void deliriumUI::recalc_widget_dimensions(int win)
 		windows[win].widgets[w]->w = (windows[win].widgets[w]->g_w * windows[win].snapx)-1;
 		windows[win].widgets[w]->h = (windows[win].widgets[w]->g_h * windows[win].snapy)-1;
 	}
+}
+
+//-------------------------------------------------------------------------------------------------------------------------------------------
+
+void deliriumUI::set_widget_parent(int win, int widget_child, int widget_parent)
+{
+	if (widget_child < 0 || widget_child > windows[win].widgets.size()) return;
+	if (widget_parent < 0 || widget_parent > windows[win].widgets.size()) return;
+	
+	windows[win].widgets[widget_child]->parent = widget_parent;
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------

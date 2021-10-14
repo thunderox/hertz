@@ -54,6 +54,7 @@ class deliriumUI
 	void display_all();
 	void refresh_widgets(int);
 	int create_widget(int,int,float,float,float,float,string);
+	void set_widget_parent(int, int, int);
 	void recalc_widget_dimensions(int);
 	
 	int screen_width, screen_height;
