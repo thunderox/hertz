@@ -35,8 +35,11 @@ void widget_level::draw(NVGcontext* vg)
 		draw_led_counter--;
 		
 		nvgBeginPath(vg);
-		if (draw_led_counter < level && value != 0) nvgRect(vg, x,y+yl,w,h/(number_of_leds*2));
-		nvgFill(vg);
+		if (draw_led_counter < level && value != 0)
+		{
+			nvgRect(vg, x,y+yl,w,h/(number_of_leds*2));
+			nvgFill(vg);
+		}
 	}
 	
 }

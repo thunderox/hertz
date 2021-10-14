@@ -47,6 +47,7 @@ class widget
 	bool redraw;
 	int parent_widget;
 	float x,y,w,h;
+	float parent_x, parent_y, parent_w, parent_h;
 	float g_x, g_y, g_w, g_h;
 	bool hover;
 	int type;

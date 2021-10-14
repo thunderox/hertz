@@ -40,10 +40,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 
 void window_resize_callback(GLFWwindow* window, int width, int height)
 {
-	window_resized = true;
-	window_resized_width = width;
-	window_resized_height = height;
-	
 	if (width < 800)
 	{
 		cout << width << endl;
@@ -51,12 +47,18 @@ void window_resize_callback(GLFWwindow* window, int width, int height)
 		glfwSetWindowSize(window, width, height);
 	}
 	
-	if (height < 800)
+	if (height < 400)
 	{
-		height = 800;
+		height = 400;
 		glfwSetWindowSize(window, width, height);
 	}
 	
+
+	window_resized = true;
+	window_resized_width = width;
+	window_resized_height = height;
+	
+
 	
 }
 

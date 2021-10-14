@@ -13,6 +13,8 @@ widget::widget()
 	old_mx = -1;
 	old_my = -1;
 	redraw = false;
+	x=0; y=0; w=0; h=0;
+	parent_x=0; parent_y=0; parent_w=0; parent_h=0;
 	parent_widget = -1; // THIS IS A STRONG SELF RELIANT INDEPENDENT WIDGET - WELL BY DEFAULT ANYWAY 
 }
 
