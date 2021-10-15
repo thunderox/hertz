@@ -321,20 +321,22 @@ void deliriumUI::display_all()
 
 		for (int x=0; x<windows[current_window].widgets.size(); x++)
 		{
-			int parent = windows[current_window].widgets[x]->parent;
-			int px = 0;
-			int py = 0;
-		
-			if (parent > -1) 
-			{
-				px = windows[current_window].widgets[x]->x;
-				px = windows[current_window].widgets[x]->y;
-			}
-		
 			nvgBeginPath(vg);
-			nvgScissor(vg, windows[current_window].widgets[x]->x + px, windows[current_window].widgets[x]->y + py,
-				windows[current_window].widgets[x]->w, windows[current_window].widgets[x]->h);
+			
+			if (windows[current_window].widgets[x]->parent == -1)
+			{
+				nvgScissor(vg, windows[current_window].widgets[x]->x, windows[current_window].widgets[x]->y,
+					windows[current_window].widgets[x]->w, windows[current_window].widgets[x]->h);
+			}
+			
+			else
+			{
+				int parent = windows[current_window].widgets[x]->parent;
 				
+				nvgScissor(vg, windows[current_window].widgets[parent]->x, windows[current_window].widgets[parent]->y,
+					windows[current_window].widgets[parent]->w, windows[current_window].widgets[parent]->h);
+			}
+						
 			windows[current_window].widgets[x]->draw(vg);
 						
 			nvgScissor(vg, 0, 0, screen_width, screen_height);
@@ -486,7 +488,19 @@ void deliriumUI::set_widget_parent(int win, int widget_child, int widget_parent)
 	if (widget_child < 0 || widget_child > windows[win].widgets.size()) return;
 	if (widget_parent < 0 || widget_parent > windows[win].widgets.size()) return;
 	
+	cout << windows[win].widgets[widget_child]->x  << " - " << windows[win].widgets[widget_child]->y << endl;
+		
 	windows[win].widgets[widget_child]->parent = widget_parent;
+				
+	windows[win].widgets[widget_child]->x = (windows[win].widgets[widget_parent]->g_x
+		+ windows[win].widgets[widget_child]->g_x) * windows[win].snapx;
+
+	windows[win].widgets[widget_child]->y = (windows[win].widgets[widget_parent]->g_y
+		+ windows[win].widgets[widget_child]->g_y) * windows[win].snapx;
+		
+	cout << windows[win].widgets[widget_child]->x  << " - " << windows[win].widgets[widget_child]->y << endl;
+	
+	// windows[win].widgets[widget_child]->redraw = true;
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------
