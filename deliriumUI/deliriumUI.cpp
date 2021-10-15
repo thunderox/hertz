@@ -14,6 +14,7 @@ int window_resized_width;
 int window_resized_height;
 
 //----------------------------------------------------------------------------------------------
+// MOUSE BUTTON CALLBACK
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
@@ -29,6 +30,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 }
 
 //----------------------------------------------------------------------------------------------
+// MOUSE SCROLL WHEEL CALLBACK
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
@@ -37,6 +39,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 
 
 //----------------------------------------------------------------------------------------------
+// WINDOW RESIZE CALLBACK
 
 void window_resize_callback(GLFWwindow* window, int width, int height)
 {
@@ -63,7 +66,7 @@ void window_resize_callback(GLFWwindow* window, int width, int height)
 }
 
 //----------------------------------------------------------------------------------------------
-
+// WINDOW GAINS FOCUS CALLBACK
 
 void window_focus_callback(GLFWwindow* window, int focused)
 {
@@ -78,6 +81,7 @@ void window_focus_callback(GLFWwindow* window, int focused)
 }
 
 //----------------------------------------------------------------------------------------------
+// DELIRIUM GUI CONSTRUCTOR
 
 deliriumUI::deliriumUI()
 {
@@ -105,6 +109,7 @@ deliriumUI::deliriumUI()
 
 
 //----------------------------------------------------------------------------------------------
+// DELIRIUM GUI CLEANUP
 
 deliriumUI::~deliriumUI()
 {
@@ -116,6 +121,7 @@ deliriumUI::~deliriumUI()
 
 
 //----------------------------------------------------------------------------------------------
+// CREATE NEW WINDOW
 
 int deliriumUI::create_window(int x, int y, int width, int height, string title)
 {
@@ -149,6 +155,7 @@ int deliriumUI::create_window(int x, int y, int width, int height, string title)
 }
 
 //---------------------------------------------------------------------------------------------
+// SET CURRENT WINDOW TO USE
 
 void deliriumUI::set_current_window(int _current_window)
 {
@@ -171,6 +178,7 @@ void deliriumUI::set_current_window(int _current_window)
 }
 
 //----------------------------------------------------------------------------------------------
+// SET THE SIZE OF THE POSITION AND SCALING GRID ON WINDOW
 
 void deliriumUI::set_window_grid(int win, int gridx, int gridy)
 {
@@ -184,204 +192,8 @@ void deliriumUI::set_window_grid(int win, int gridx, int gridy)
 	}
 }
 
-//----------------------------------------------------------------------------------------------
-
-int deliriumUI::main_loop()
-{
-	double mx,my;
-	
-	if (current_window > -1 && current_window < windows.size())
-	{
-		GLFWwindow* window = windows[current_window].window;
-		NVGcontext* vg = windows[current_window].vg; 
-		glfwSetMouseButtonCallback(window, mouse_button_callback);
-		glfwSetScrollCallback(window, scroll_callback);
-		glfwSetWindowFocusCallback(window, window_focus_callback);
-		glfwSetFramebufferSizeCallback(window, window_resize_callback); 
-			
-			glfwWaitEventsTimeout(0.25);
-			
-				if (window_gained_focus)
-				{
-					window_gained_focus = false;
-					windows[current_window].window_gained_focus = true;
-				}
-				
-				if (window_resized)
-				{
-					window_resized = false;
-					screen_width = window_resized_width;
-					screen_height = window_resized_height;
-					winWidth = window_resized_width;
-					winHeight = window_resized_height;
-					glViewport( 0, 0, winWidth, winHeight);
-					recalc_widget_dimensions(current_window);
-					windows[current_window].window_resized = true;
-				}
-
-				glfwGetCursorPos(window, &mx, &my);
-
-				int current_widget = windows[current_window].current_widget;
-				mouse_left_button = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
-			
-				if (current_widget > -1 && windows[current_window].widgets[current_widget]->hover)
-				{
-					if ( mouse_left_released && windows[current_window].widgets[current_widget]->type != widget_type_switch)
-						mouse_left_released = false;
-				
-					if ( mouse_left_released && windows[current_window].widgets[current_widget]->type == widget_type_switch)
-					{
-						windows[current_window].widgets[current_widget]->left_button();
-						windows[current_window].widgets[current_widget]->redraw = true;
-						mouse_left_released = false;
-					}
-				
-					if (mouse_left_button)
-					{				
-						if (windows[current_window].widgets[current_widget]->type != widget_type_switch)
-						{
-							windows[current_window].widgets[current_widget]->drag(mx, my);
-							windows[current_window].widgets[current_widget]->redraw = true;
-						}
-					}
-					
-					if (mouse_scroll_y == -1) { windows[current_window].widgets[current_widget]->value_inc(); mouse_scroll_y = 0; }
-					if (mouse_scroll_y == 1) { windows[current_window].widgets[current_widget]->value_dec(); mouse_scroll_y = 0; }
-					
-					if (mouse_middle_button_released)
-					{
-						mouse_middle_button_released = false;
-						windows[current_window].widgets[current_widget]->set_value
-							(windows[current_window].widgets[current_widget]->default_value);
-						windows[current_window].widgets[current_widget]->redraw = true;
-					}
-				}
-				
-				if (!mouse_left_button) mouse_over(mx,my);
-			
-			refresh_widgets(current_window);
-		
-	}
-	return 0;
-}
-
-//----------------------------------------------------------------------------------------------
-int deliriumUI::mouse_over(int mx, int my)
-{
-
-	Rectangle test_rect;
-	windows[current_window].current_widget = -1;
-
-	for (int x=0; x<windows[current_window].widgets.size(); x++)
-	{
-	
-		int parent = windows[current_window].widgets[x]->parent;
-		int px = 0;
-		int py = 0;
-		
-		if (parent > -1) 
-		{
-			px = windows[current_window].widgets[x]->x;
-			px = windows[current_window].widgets[x]->y;
-		}
-		
-		test_rect.setX(windows[current_window].widgets[x]->x + px );
-		test_rect.setY(windows[current_window].widgets[x]->y + py);
-		test_rect.setWidth(windows[current_window].widgets[x]->w );
-		test_rect.setHeight(windows[current_window].widgets[x]->h );
-
-		if (test_rect.contains(mx,my) && windows[current_window].widgets[x]->type != widget_type_panel)
-		{
-			windows[current_window].current_widget = x;
-			windows[current_window].widgets[x]->hover = true;
-			windows[current_window].widgets[x]->redraw = true;
-			
-		}
-		if (!test_rect.contains(mx,my) && windows[current_window].widgets[x]->hover)
-		{
-			windows[current_window].widgets[x]->hover = false;
-			windows[current_window].widgets[x]->redraw = true;
-		}
-	}
-
-	return windows[current_window].current_widget;
-}
-
-//----------------------------------------------------------------------------------------------
-
-void deliriumUI::display_all()
-{
-	if (current_window > -1 && current_window < windows.size())
-	{
-		NVGcontext* vg = windows[current_window].vg;
-		nvgBeginPath(vg);
-		nvgRect(vg, 0,0,screen_width,screen_height);
-		nvgFillPaint(vg, nvgRadialGradient(vg, screen_width/2, screen_height/2,600,1000, nvgRGBA(20,20,20,255),nvgRGBA(5,5,5,255))); 
-		nvgFill(vg);
-
-		for (int x=0; x<windows[current_window].widgets.size(); x++)
-		{
-			nvgBeginPath(vg);
-			
-			if (windows[current_window].widgets[x]->parent == -1)
-			{
-				nvgScissor(vg, windows[current_window].widgets[x]->x, windows[current_window].widgets[x]->y,
-					windows[current_window].widgets[x]->w, windows[current_window].widgets[x]->h);
-			}
-			
-			else
-			{
-				int parent = windows[current_window].widgets[x]->parent;
-				
-				nvgScissor(vg, windows[current_window].widgets[parent]->x, windows[current_window].widgets[parent]->y,
-					windows[current_window].widgets[parent]->w, windows[current_window].widgets[parent]->h);
-			}
-						
-			windows[current_window].widgets[x]->draw(vg);
-						
-			nvgScissor(vg, 0, 0, screen_width, screen_height);
-		}
-	}
-	
-}
-
 //-----------------------------------------------------------------------------------------------
-
-
-void deliriumUI::refresh_widgets(int window)
-{
-	windows[window].widget_draw = false;
-
-	if (current_window > -1 && current_window < windows.size())
-	{
-		NVGcontext* vg = windows[current_window].vg;
-		nvgBeginPath(vg);
-		nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0, screen_height/2, nvgRGBA(40,40,40,255),nvgRGBA(10,10,10,255)));
-		for (int x=0; x<windows[window].widgets.size(); x++)
-		{
-			if (windows[current_window].widgets[x]->redraw && windows[current_window].widgets[x]->type != widget_type_grid)
-			{
-				nvgRect(vg, windows[current_window].widgets[x]->x, windows[current_window].widgets[x]->y,
-					windows[current_window].widgets[x]->w, windows[current_window].widgets[x]->h);
-					windows[window].widget_draw = true; 
-			}
-			if (windows[window].widget_draw) nvgFill(vg);
-		}
-
-		for (int x=0; x<windows[window].widgets.size(); x++)
-		{
-			if (windows[current_window].widgets[x]->redraw)
-			{
-				windows[current_window].widgets[x]->redraw = false;
-				nvgBeginPath(vg);
-				windows[current_window].widgets[x]->draw(vg);
-			}			
-		}
-	}
-	
-}
-
-//-----------------------------------------------------------------------------------------------
+// CREATE NEW WIDGET
 
 int deliriumUI::create_widget(int type, int win, float x, float y, float w, float h, string text_top)
 {
@@ -464,6 +276,30 @@ int deliriumUI::create_widget(int type, int win, float x, float y, float w, floa
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------
+// SET THAT THIS WIDGET HAS A PARENT WHICH GOVERNS HOW IT IS POSITIONED AND CROPPED
+
+void deliriumUI::set_widget_parent(int win, int widget_child, int widget_parent)
+{
+	if (widget_child < 0 || widget_child > windows[win].widgets.size()) return;
+	if (widget_parent < 0 || widget_parent > windows[win].widgets.size()) return;
+	
+	cout << windows[win].widgets[widget_child]->x  << " - " << windows[win].widgets[widget_child]->y << endl;
+		
+	windows[win].widgets[widget_child]->parent = widget_parent;
+				
+	windows[win].widgets[widget_child]->x = (windows[win].widgets[widget_parent]->g_x
+		+ windows[win].widgets[widget_child]->g_x) * windows[win].snapx;
+
+	windows[win].widgets[widget_child]->y = (windows[win].widgets[widget_parent]->g_y
+		+ windows[win].widgets[widget_child]->g_y) * windows[win].snapx;
+	
+	// windows[win].widgets[widget_child]->redraw = true;
+}
+
+
+
+//-------------------------------------------------------------------------------------------------------------------------------------------
+// RECACULATE THE POSITIONS AND DIMENSIONS OF ALL WIDGETS WHEN WINDOW IS RESIZED
 
 void deliriumUI::recalc_widget_dimensions(int win)
 {
@@ -481,29 +317,241 @@ void deliriumUI::recalc_widget_dimensions(int win)
 	}
 }
 
-//-------------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+//REDRAW ENTIRE WINDOW AND ALL CONTAINING WIDGETS
 
-void deliriumUI::set_widget_parent(int win, int widget_child, int widget_parent)
+void deliriumUI::display_all()
 {
-	if (widget_child < 0 || widget_child > windows[win].widgets.size()) return;
-	if (widget_parent < 0 || widget_parent > windows[win].widgets.size()) return;
-	
-	cout << windows[win].widgets[widget_child]->x  << " - " << windows[win].widgets[widget_child]->y << endl;
-		
-	windows[win].widgets[widget_child]->parent = widget_parent;
-				
-	windows[win].widgets[widget_child]->x = (windows[win].widgets[widget_parent]->g_x
-		+ windows[win].widgets[widget_child]->g_x) * windows[win].snapx;
+	if (current_window > -1 && current_window < windows.size())
+	{
+		NVGcontext* vg = windows[current_window].vg;
+		nvgBeginPath(vg);
+		nvgRect(vg, 0,0,screen_width,screen_height);
+		nvgFillPaint(vg, nvgRadialGradient(vg, screen_width/2, screen_height/2,600,1000, nvgRGBA(20,20,20,255),nvgRGBA(5,5,5,255))); 
+		nvgFill(vg);
 
-	windows[win].widgets[widget_child]->y = (windows[win].widgets[widget_parent]->g_y
-		+ windows[win].widgets[widget_child]->g_y) * windows[win].snapx;
-		
-	cout << windows[win].widgets[widget_child]->x  << " - " << windows[win].widgets[widget_child]->y << endl;
+		for (int x=0; x<windows[current_window].widgets.size(); x++)
+		{
+			draw_widget(current_window, x);
+		}
+	}
 	
-	// windows[win].widgets[widget_child]->redraw = true;
 }
 
+//-----------------------------------------------------------------------------------------------
+// REFRESH ANY WIDGETS THAT NEED TO BE REDRAWN
+
+void deliriumUI::refresh_widgets(int window)
+{
+	windows[window].widget_draw = false;
+
+	if (current_window > -1 && current_window < windows.size())
+	{
+		NVGcontext* vg = windows[current_window].vg;
+		nvgBeginPath(vg);
+		nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0, screen_height/2, nvgRGBA(40,40,40,255),nvgRGBA(10,10,10,255)));
+		
+		for (int x=0; x<windows[window].widgets.size(); x++)
+		{
+			if (windows[current_window].widgets[x]->redraw && windows[current_window].widgets[x]->type != widget_type_grid)
+			{
+				nvgRect(vg, windows[current_window].widgets[x]->x, windows[current_window].widgets[x]->y,
+					windows[current_window].widgets[x]->w, windows[current_window].widgets[x]->h);
+					windows[window].widget_draw = true; 
+			}
+			// if (windows[window].widget_draw) nvgFill(vg);
+		}
+
+		for (int x=0; x<windows[window].widgets.size(); x++)
+		{
+			if (windows[current_window].widgets[x]->redraw)
+			{
+				windows[current_window].widgets[x]->redraw = false;
+				draw_widget(current_window, x);
+			}			
+		}
+	}
+	
+}
+
+//-----------------------------------------------------------------------------------------------
+// DRAW WIDGET ACCORDING TO GRID POSITIONS, PARENT COORDINATES AND CLIPPING
+
+void deliriumUI::draw_widget(int win, int widget_number)
+{
+	if (win < 0 || win >= current_window < windows.size()) return;
+	if (widget_number < 0 || widget_number >= windows[win].widgets.size()) return;
+	
+	int x=0;
+	int y=0;
+	int w = windows[win].widgets[widget_number]->w;
+	int h = windows[win].widgets[widget_number]->h;
+
+	NVGcontext* vg = windows[current_window].vg;
+
+	nvgBeginPath(vg);
+	nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0, screen_height/2, nvgRGBA(40,40,40,255),nvgRGBA(10,10,10,255)));
+	
+	int parent = windows[win].widgets[widget_number]->parent;
+			
+	if (parent == -1)
+	{
+		x = windows[win].widgets[widget_number]->x;
+		y = windows[win].widgets[widget_number]->y;
+		
+		nvgScissor(vg, x, y, w, h);
+		nvgRect(vg, x, y, w, h);
+		nvgFill(vg);
+	}			
+	else
+	{
+		x = windows[win].widgets[parent]->x;
+		y = windows[win].widgets[parent]->y;
+		
+		nvgScissor(vg, windows[win].widgets[widget_number]->x, windows[win].widgets[widget_number]->, w, h);
+		nvgRect(vg, x, y, w, h);
+		nvgFill(vg);
+	}
+	
+	nvgScissor(vg, x, y, w, h);
+				
+	nvgBeginPath(vg);
+	windows[win].widgets[widget_number]->draw(vg);
+						
+	nvgScissor(vg, 0, 0, screen_width, screen_height);
+}
+
+
+//----------------------------------------------------------------------------------------------
+// MAIN GUI EVENT LOOP CHECKING INPUT EVENTS AND REDRAWING WIDGETS
+
+int deliriumUI::main_loop()
+{
+	double mx,my;
+	
+	if (current_window > -1 && current_window < windows.size())
+	{
+		GLFWwindow* window = windows[current_window].window;
+		NVGcontext* vg = windows[current_window].vg; 
+		glfwSetMouseButtonCallback(window, mouse_button_callback);
+		glfwSetScrollCallback(window, scroll_callback);
+		glfwSetWindowFocusCallback(window, window_focus_callback);
+		glfwSetFramebufferSizeCallback(window, window_resize_callback); 
+			
+			glfwWaitEventsTimeout(0.25);
+			
+				if (window_gained_focus)
+				{
+					window_gained_focus = false;
+					windows[current_window].window_gained_focus = true;
+				}
+				
+				if (window_resized)
+				{
+					window_resized = false;
+					screen_width = window_resized_width;
+					screen_height = window_resized_height;
+					winWidth = window_resized_width;
+					winHeight = window_resized_height;
+					glViewport( 0, 0, winWidth, winHeight);
+					recalc_widget_dimensions(current_window);
+					windows[current_window].window_resized = true;
+				}
+
+				glfwGetCursorPos(window, &mx, &my);
+
+				int current_widget = windows[current_window].current_widget;
+				mouse_left_button = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+			
+				if (current_widget > -1 && windows[current_window].widgets[current_widget]->hover)
+				{
+					if ( mouse_left_released && windows[current_window].widgets[current_widget]->type != widget_type_switch)
+						mouse_left_released = false;
+				
+					if ( mouse_left_released && windows[current_window].widgets[current_widget]->type == widget_type_switch)
+					{
+						windows[current_window].widgets[current_widget]->left_button();
+						windows[current_window].widgets[current_widget]->redraw = true;
+						mouse_left_released = false;
+					}
+				
+					if (mouse_left_button)
+					{				
+						if (windows[current_window].widgets[current_widget]->type != widget_type_switch)
+						{
+							windows[current_window].widgets[current_widget]->drag(mx, my);
+							windows[current_window].widgets[current_widget]->redraw = true;
+						}
+					}
+					
+					if (mouse_scroll_y == -1) { windows[current_window].widgets[current_widget]->value_inc(); mouse_scroll_y = 0; }
+					if (mouse_scroll_y == 1) { windows[current_window].widgets[current_widget]->value_dec(); mouse_scroll_y = 0; }
+					
+					if (mouse_middle_button_released)
+					{
+						mouse_middle_button_released = false;
+						windows[current_window].widgets[current_widget]->set_value
+							(windows[current_window].widgets[current_widget]->default_value);
+						windows[current_window].widgets[current_widget]->redraw = true;
+					}
+				}
+				
+				if (!mouse_left_button) mouse_over(mx,my);
+			
+			refresh_widgets(current_window);
+		
+	}
+	return 0;
+}
+
+//----------------------------------------------------------------------------------------------
+// IS THE MOUSE OVER A WIDGET CURRENTLY
+
+int deliriumUI::mouse_over(int mx, int my)
+{
+
+	Rectangle test_rect;
+	windows[current_window].current_widget = -1;
+
+	for (int x=0; x<windows[current_window].widgets.size(); x++)
+	{
+	
+		int parent = windows[current_window].widgets[x]->parent;
+		int px = 0;
+		int py = 0;
+		
+		if (parent > -1) 
+		{
+			px = windows[current_window].widgets[x]->x;
+			px = windows[current_window].widgets[x]->y;
+		}
+		
+		test_rect.setX(windows[current_window].widgets[x]->x + px );
+		test_rect.setY(windows[current_window].widgets[x]->y + py);
+		test_rect.setWidth(windows[current_window].widgets[x]->w );
+		test_rect.setHeight(windows[current_window].widgets[x]->h );
+
+		if (test_rect.contains(mx,my) && windows[current_window].widgets[x]->type != widget_type_panel)
+		{
+			windows[current_window].current_widget = x;
+			windows[current_window].widgets[x]->hover = true;
+			windows[current_window].widgets[x]->redraw = true;
+			
+		}
+		if (!test_rect.contains(mx,my) && windows[current_window].widgets[x]->hover)
+		{
+			windows[current_window].widgets[x]->hover = false;
+			windows[current_window].widgets[x]->redraw = true;
+		}
+	}
+
+	return windows[current_window].current_widget;
+}
+
+
+
 //-------------------------------------------------------------------------------------------------------------------------------------------
+// FUNCTION TO DETECT POINTS INSIDE A RECEANGLE
 
 	void Rectangle::setX(int _x)
 	{

@@ -45,17 +45,20 @@ class deliriumUI
 	
 	deliriumUI();
 	~deliriumUI();
+	
 	int create_window(int, int, int, int, string);
 	void set_current_window(int);
 	void set_window_grid(int,int,int);
 	
-	int main_loop();
-	int mouse_over(int,int);
-	void display_all();
-	void refresh_widgets(int);
 	int create_widget(int,int,float,float,float,float,string);
 	void set_widget_parent(int, int, int);
 	void recalc_widget_dimensions(int);
+
+	void display_all();
+	void refresh_widgets(int);	
+	void draw_widget(int, int);
+	int main_loop();
+	int mouse_over(int,int);
 	
 	int screen_width, screen_height;
 	string window_title;
