@@ -40,20 +40,7 @@ int main()
 	int song_track_widget_number[256];
 	int widget_grid_edit[1024];
 	
-	for (int trk=0; trk < my_song.get_number_of_tracks(); trk++)
-	{
-		int wid = main_gui.create_widget(widget_type_grid, win, ((trk+1)*3.25)+4, 16, 3.2, 24, "");
-		
-		my_song.tracks[trk].x = main_gui.windows[win].widgets[wid]->x;
-		my_song.tracks[trk].y = main_gui.windows[win].widgets[wid]->y;
-		my_song.tracks[trk].w = main_gui.windows[win].widgets[wid]->w;
-		my_song.tracks[trk].h = main_gui.windows[win].widgets[wid]->h;
-		
-		widget_grid_edit[trk] = wid;
-	}
-
-	
-	int panel_mixer = main_gui.create_widget(widget_type_panel, win, 1,0.5, 42,14, "MIXER");
+	int panel_mixer = main_gui.create_widget(widget_type_panel, win, 1,0.5, 42,30, "MIXER");
 	int panel_editor = main_gui.create_widget(widget_type_panel, win, 50,0.5, 10,30, "EDITOR");
 	
 	int child_widget = main_gui.create_widget(widget_type_button, win, 0, 0, 3.5, 1, "PICKY");
@@ -64,31 +51,46 @@ int main()
 	
 	child_widget = main_gui.create_widget(widget_type_button, win, 8, 0, 3.5, 1, "BOG 3");
 	main_gui.set_widget_parent(win, child_widget, panel_editor);
+
+	for (int trk=0; trk < my_song.get_number_of_tracks(); trk++)
+	{
+		float track_x_pos = 0.5 + (trk * 3.25);
+		int wid = main_gui.create_widget(widget_type_grid, win, track_x_pos, 14, 3.2, 24, "");
+		main_gui.set_widget_parent(win, wid, panel_mixer);
+		
+		my_song.tracks[trk].x = main_gui.windows[win].widgets[wid]->x;
+		my_song.tracks[trk].y = main_gui.windows[win].widgets[wid]->y;
+		my_song.tracks[trk].w = main_gui.windows[win].widgets[wid]->w;
+		my_song.tracks[trk].h = main_gui.windows[win].widgets[wid]->h;
+		
+		widget_grid_edit[trk] = wid;
+	}
 	
 	for (int trk=0; trk < my_song.get_number_of_tracks(); trk++)
 	{	
-		float track_x_pos = 4 + (trk+1) * 3.25;
+		float track_x_pos = 0.5 + (trk * 3.25);
 		ss.str("");
 		ss << trk;
-		main_gui.create_widget(widget_type_button, win, track_x_pos, 1, 3, 1, my_song.get_track_name(trk));
+		int track_title_button = main_gui.create_widget(widget_type_button, win, track_x_pos, 1, 3, 1, my_song.get_track_name(trk));
+		main_gui.set_widget_parent(win, track_title_button, panel_mixer);
 		
 		int fader_widget_number = main_gui.create_widget(widget_type_fader, win,track_x_pos, 2.25, 1.5, 8, ss.str());
 		main_gui.windows[win].widgets[fader_widget_number]->set_value(0.5);
 		main_gui.windows[win].widgets[fader_widget_number]->set_default_value(0.5);
+		main_gui.set_widget_parent(win, fader_widget_number, panel_mixer);
 		
 		int level_widget_number_left = main_gui.create_widget(widget_type_level, win,track_x_pos + 1.75, 2.25, 0.5, 8, ss.str());
+		main_gui.set_widget_parent(win, level_widget_number_left, panel_mixer);
+		
 		int level_widget_number_right = main_gui.create_widget(widget_type_level, win,track_x_pos + 3 - 0.5, 2.25, 0.5, 8, ss.str());
+		main_gui.set_widget_parent(win, level_widget_number_right, panel_mixer);
 		
 		int pan_widget_number = main_gui.create_widget(widget_type_knob, win, track_x_pos, 11, 2,3, "PAN");
 		main_gui.windows[win].widgets[pan_widget_number]->set_value(0.5);
 		main_gui.windows[win].widgets[pan_widget_number]->set_default_value(0.5);
+		main_gui.set_widget_parent(win, pan_widget_number, panel_mixer);
 	}
 	
-	
-	int volume_knob = main_gui.create_widget(widget_type_knob, win, 1, 8, 4,5, "VOLUME");
-	main_gui.windows[win].widgets[volume_knob]->set_value(0.5);
-	main_gui.windows[win].widgets[volume_knob]->set_default_value(0.5);
-
 	int current_window = main_gui.current_window;
 	NVGcontext* vg = main_gui.windows[current_window].vg;
 	

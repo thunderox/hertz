@@ -45,7 +45,6 @@ void window_resize_callback(GLFWwindow* window, int width, int height)
 {
 	if (width < 800)
 	{
-		cout << width << endl;
 		width = 800;
 		glfwSetWindowSize(window, width, height);
 	}
@@ -61,7 +60,7 @@ void window_resize_callback(GLFWwindow* window, int width, int height)
 	window_resized_width = width;
 	window_resized_height = height;
 	
-
+	cout << width << " - " << height << endl;
 	
 }
 
@@ -282,8 +281,6 @@ void deliriumUI::set_widget_parent(int win, int widget_child, int widget_parent)
 {
 	if (widget_child < 0 || widget_child > windows[win].widgets.size()) return;
 	if (widget_parent < 0 || widget_parent > windows[win].widgets.size()) return;
-	
-	cout << windows[win].widgets[widget_child]->x  << " - " << windows[win].widgets[widget_child]->y << endl;
 		
 	windows[win].widgets[widget_child]->parent = widget_parent;
 				
@@ -310,10 +307,30 @@ void deliriumUI::recalc_widget_dimensions(int win)
 	
 	for (int w=0; w<windows[win].widgets.size(); w++)
 	{
-		windows[win].widgets[w]->x = windows[win].widgets[w]->g_x * windows[win].snapx;
-		windows[win].widgets[w]->y = windows[win].widgets[w]->g_y * windows[win].snapy;
-		windows[win].widgets[w]->w = (windows[win].widgets[w]->g_w * windows[win].snapx)-1;
-		windows[win].widgets[w]->h = (windows[win].widgets[w]->g_h * windows[win].snapy)-1;
+	
+		int parent = windows[win].widgets[w]->parent;
+		
+		if (parent == -1)
+		{
+			windows[win].widgets[w]->x = windows[win].widgets[w]->g_x * windows[win].snapx;
+			windows[win].widgets[w]->y = windows[win].widgets[w]->g_y * windows[win].snapy;
+			windows[win].widgets[w]->w = (windows[win].widgets[w]->g_w * windows[win].snapx)-1;
+			windows[win].widgets[w]->h = (windows[win].widgets[w]->g_h * windows[win].snapy)-1;
+		}
+		else if (parent > -1)
+		{
+			windows[win].widgets[parent]->x = windows[win].widgets[parent]->g_x * windows[win].snapx;
+			windows[win].widgets[parent]->y = windows[win].widgets[parent]->g_y * windows[win].snapy;
+			windows[win].widgets[parent]->w = (windows[win].widgets[parent]->g_w * windows[win].snapx)-1;
+			windows[win].widgets[parent]->h = (windows[win].widgets[parent]->g_h * windows[win].snapy)-1;
+			
+			windows[win].widgets[w]->x = windows[win].widgets[w]->g_x * windows[win].snapx;
+			windows[win].widgets[w]->y = windows[win].widgets[w]->g_y * windows[win].snapy;
+			windows[win].widgets[w]->x += windows[win].widgets[parent]->g_x * windows[win].snapx;
+			windows[win].widgets[w]->y += windows[win].widgets[parent]->g_y * windows[win].snapy;
+			windows[win].widgets[w]->w = (windows[win].widgets[w]->g_w * windows[win].snapx)-1;
+			windows[win].widgets[w]->h = (windows[win].widgets[w]->g_h * windows[win].snapy)-1;
+		}
 	}
 }
 
@@ -382,38 +399,31 @@ void deliriumUI::draw_widget(int win, int widget_number)
 	if (win < 0 || win >= current_window < windows.size()) return;
 	if (widget_number < 0 || widget_number >= windows[win].widgets.size()) return;
 	
-	int x=0;
-	int y=0;
+	if (windows[win].widgets[widget_number]->type == widget_type_grid) return;
+	
+	int x = windows[win].widgets[widget_number]->x;
+	int y = windows[win].widgets[widget_number]->y;
 	int w = windows[win].widgets[widget_number]->w;
 	int h = windows[win].widgets[widget_number]->h;
 
 	NVGcontext* vg = windows[current_window].vg;
 
-	nvgBeginPath(vg);
-	nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0, screen_height/2, nvgRGBA(40,40,40,255),nvgRGBA(10,10,10,255)));
-	
 	int parent = windows[win].widgets[widget_number]->parent;
 			
 	if (parent == -1)
 	{
-		x = windows[win].widgets[widget_number]->x;
-		y = windows[win].widgets[widget_number]->y;
-		
 		nvgScissor(vg, x, y, w, h);
-		nvgRect(vg, x, y, w, h);
-		nvgFill(vg);
 	}			
 	else
 	{
-		x = windows[win].widgets[parent]->x;
-		y = windows[win].widgets[parent]->y;
-		
-		nvgScissor(vg, windows[win].widgets[widget_number]->x, windows[win].widgets[widget_number]->, w, h);
-		nvgRect(vg, x, y, w, h);
-		nvgFill(vg);
+		nvgScissor(vg, windows[win].widgets[parent]->x, windows[win].widgets[parent]->y,
+			windows[win].widgets[parent]->w, windows[win].widgets[parent]->h);		
 	}
 	
-	nvgScissor(vg, x, y, w, h);
+	nvgBeginPath(vg);
+	nvgFillPaint(vg, nvgLinearGradient(vg, 0,0,0, screen_height/2, nvgRGBA(40,40,40,255), nvgRGBA(10,10,10,255)));
+	nvgRect(vg, x, y, w, h);
+	nvgFill(vg);
 				
 	nvgBeginPath(vg);
 	windows[win].widgets[widget_number]->draw(vg);
@@ -515,19 +525,8 @@ int deliriumUI::mouse_over(int mx, int my)
 
 	for (int x=0; x<windows[current_window].widgets.size(); x++)
 	{
-	
-		int parent = windows[current_window].widgets[x]->parent;
-		int px = 0;
-		int py = 0;
-		
-		if (parent > -1) 
-		{
-			px = windows[current_window].widgets[x]->x;
-			px = windows[current_window].widgets[x]->y;
-		}
-		
-		test_rect.setX(windows[current_window].widgets[x]->x + px );
-		test_rect.setY(windows[current_window].widgets[x]->y + py);
+		test_rect.setX(windows[current_window].widgets[x]->x );
+		test_rect.setY(windows[current_window].widgets[x]->y);
 		test_rect.setWidth(windows[current_window].widgets[x]->w );
 		test_rect.setHeight(windows[current_window].widgets[x]->h );
 
@@ -542,6 +541,23 @@ int deliriumUI::mouse_over(int mx, int my)
 		{
 			windows[current_window].widgets[x]->hover = false;
 			windows[current_window].widgets[x]->redraw = true;
+		}
+	}
+
+	if (windows[current_window].current_widget > -1) 
+	{		
+		int current_widget = windows[current_window].current_widget;
+		int parent = windows[current_window].widgets[current_widget]->parent;
+		if (parent > -1)
+		{
+			if (mx > windows[current_window].widgets[parent]->w + windows[current_window].widgets[parent]->x ||
+				my > windows[current_window].widgets[parent]->h + windows[current_window].widgets[parent]->y)
+			{
+					windows[current_window].current_widget = -1;
+					windows[current_window].widgets[current_widget]->hover = false;
+					windows[current_window].widgets[current_widget]->redraw = true;
+	
+			}
 		}
 	}
 
