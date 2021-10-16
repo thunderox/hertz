@@ -302,8 +302,8 @@ void deliriumUI::recalc_widget_dimensions(int win)
 {
 	if (win < 0 || win > windows.size()) return;
 	
-	windows[win].snapx = screen_width / windows[win].gridx;
-	windows[win].snapy = screen_height / windows[win].gridy;
+	windows[win].snapx = (float)screen_width / (float)windows[win].gridx;
+	windows[win].snapy = (float)screen_height / (float)windows[win].gridy;
 	
 	for (int w=0; w<windows[win].widgets.size(); w++)
 	{

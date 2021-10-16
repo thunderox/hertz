@@ -40,7 +40,7 @@ int main()
 	int song_track_widget_number[256];
 	int widget_grid_edit[1024];
 	
-	int panel_mixer = main_gui.create_widget(widget_type_panel, win, 1,0.5, 42,30, "MIXER");
+	int panel_mixer = main_gui.create_widget(widget_type_panel, win, 1,0.5, 42,46, "MIXER");
 	int panel_editor = main_gui.create_widget(widget_type_panel, win, 50,0.5, 10,30, "EDITOR");
 	
 	int child_widget = main_gui.create_widget(widget_type_button, win, 0, 0, 3.5, 1, "PICKY");
