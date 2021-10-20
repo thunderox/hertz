@@ -47,13 +47,11 @@ void window_resize_callback(GLFWwindow* window, int width, int height)
 	if (width < 800)
 	{
 		width = 800;
-		glfwSetWindowSize(window, width, height);
 	}
 	
 	if (height < 400)
 	{
 		height = 400;
-		glfwSetWindowSize(window, width, height);
 	}
 	
 
@@ -95,6 +93,7 @@ deliriumUI::deliriumUI()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL 
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+	glfwWindowHint(GLFW_MAXIMIZED, GL_FALSE);
 
 	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
@@ -126,6 +125,7 @@ int deliriumUI::create_window(int x, int y, int width, int height, string title)
 	GLFWwindow* glfw_win = glfwCreateWindow(width,height, title.c_str(), NULL, NULL);
 	delirium_window new_window;
 	new_window.window = glfw_win;
+	glfwSetWindowSize(new_window.window, width, height);
 	glfwSetWindowPos(new_window.window, x, y);
 	
 	glfwMakeContextCurrent( glfw_win ); 
@@ -164,11 +164,11 @@ void deliriumUI::set_current_window(int _current_window)
 		GLFWwindow* window = windows[current_window].window;
 	
 		glfwMakeContextCurrent( window ); 
-		glfwGetWindowSize(window, &winWidth, &winHeight);
-		fbWidth=winWidth; fbHeight=winHeight;
-		pxRatio = (float)fbWidth / (float)winWidth;
+		glfwGetWindowSize(window, &window_width, &window_height);
+		fbWidth=window_width; fbHeight=window_height;
+		pxRatio = (float)fbWidth / (float)window_width;
 		// set up view
-		glViewport( 0, 0, winWidth, winHeight);
+		glViewport( 0, 0, window_width, window_height);
 		glMatrixMode( GL_PROJECTION );
 		glLoadIdentity();
 		glfwSwapInterval( 0.5 );
@@ -185,8 +185,10 @@ void deliriumUI::set_window_grid(int win, int gridx, int gridy)
 		windows[win].gridx = gridx;
 		windows[win].gridy = gridy;
 	
-		windows[win].snapx = screen_width / gridx;
-		windows[win].snapy = screen_height / gridy;
+		windows[win].snapx = window_width / gridx;
+		windows[win].snapy = window_height / gridy;
+		
+		cout << windows[win].snapx << " - " << windows[win].snapy << endl;
 	}
 }
 
@@ -301,8 +303,10 @@ void deliriumUI::recalc_widget_dimensions(int win)
 {
 	if (win < 0 || win > windows.size()) return;
 	
-	windows[win].snapx = (float)screen_width / (float)windows[win].gridx;
-	windows[win].snapy = (float)screen_height / (float)windows[win].gridy;
+	// windows[win].snapx = (float)window_width / (float)windows[win].gridx;
+	// windows[win].snapy = ((float)window_height+64) / (float)windows[win].gridy;
+	
+	cout << windows[win].snapx << " - " << windows[win].snapy << endl;
 	
 	for (int w=0; w<windows[win].widgets.size(); w++)
 	{
@@ -458,11 +462,9 @@ int deliriumUI::main_loop()
 				if (window_resized)
 				{
 					window_resized = false;
-					screen_width = window_resized_width;
-					screen_height = window_resized_height;
-					winWidth = window_resized_width;
-					winHeight = window_resized_height;
-					glViewport( 0, 0, winWidth, winHeight);
+					window_width = window_resized_width;
+					window_height = window_resized_height;
+					glViewport( 0, 0, window_width, window_height);
 					recalc_widget_dimensions(current_window);
 					windows[current_window].window_resized = true;
 				}

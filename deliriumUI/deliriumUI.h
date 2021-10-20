@@ -86,7 +86,7 @@ class deliriumUI
 		
 
 	int font;
-	int winWidth, winHeight;
+	int window_width, window_height;
 	int fbWidth, fbHeight;
 
 };

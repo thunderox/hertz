@@ -355,7 +355,6 @@ bool song::load_midi_file(string file_name)
 	
 	for (uint16_t nChunk = 0; nChunk < nTrackChunks; nChunk++)
 	{			
-		std::cout << "===== NEW TRACK" << std::endl;
 		// Read Track Header
 		ifs.read((char*)&n32, sizeof(uint32_t));
 		uint32_t nTrackID = Swap32(n32);
