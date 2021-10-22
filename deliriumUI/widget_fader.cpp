@@ -7,12 +7,17 @@
 //----------------------------------------------------------------------------------------------
 void widget_fader::draw(NVGcontext* vg)
 {
+	// DRAW BACKGROUND GRAD FILL
+
 	nvgBeginPath(vg);
 	nvgRect(vg, x,y,w,h);
 	nvgFillPaint(vg, nvgLinearGradient(vg, x,y,x+w,y+h, nvgRGBA(80,80,80,255),nvgRGBA(30,30,30,255))); 
 	nvgFill(vg);
 	
+	// DRAW FADER HORIZONTAL MARKER LINES
+	
 	nvgBeginPath(vg);
+	nvgStrokeWidth(vg, 1);
 	nvgStrokeColor(vg, nvgRGBA(200,200,200,32));
 	
 	float top_y = 16;
@@ -26,16 +31,21 @@ void widget_fader::draw(NVGcontext* vg)
 		nvgLineTo(vg,  x+(w/2)+(w/3), y + ly);
 	}
 	
+	// DRAW CENTRAL VERTICAL LINE
+	
 	nvgMoveTo(vg, x+(w/2), y+top_y);
 	nvgLineTo(vg, x+(w/2), y+(h-bottom_y));
 	nvgStroke(vg);
 
-
+	// CENTRAL LINE SHADOW
+	
 	nvgBeginPath(vg);
 	nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 255));
 	nvgMoveTo(vg, 1+x + (w / 2), y + top_y);
 	nvgLineTo(vg, 1+x + (w / 2), y + (h - bottom_y));
 	nvgStroke(vg);
+	
+	// FADER RECTANGLE THAT MOVES WITH VALUE
 	
 	float fade_h = h-64;
 	float fade_y = (y+16) + (fade_h * (1-value));
@@ -45,11 +55,15 @@ void widget_fader::draw(NVGcontext* vg)
 	nvgRect(vg, x, fade_y, w, 32);
 	nvgFill(vg);	
 
+	// CENTRAL HORIZONTAL LINE ON FADER RECTANGLE THAT MOVES WITH VALUE
+
 	nvgBeginPath(vg);
 	nvgStrokeColor(vg, nvgRGBA(200, 200, 200, 128));
 	nvgMoveTo(vg, x, fade_y+12);
 	nvgLineTo(vg, x + w, fade_y + 12);
 	nvgStroke(vg);
+
+	// DRAW LABEL TEXT
 
 	nvgBeginPath(vg);
 	float font_size = 10.0f;
@@ -61,10 +75,21 @@ void widget_fader::draw(NVGcontext* vg)
 	float text_width = (font_size/1.75) * text_top.length();
 	nvgText(vg, x + ((w / 2) - (text_width / 2)), y, text_top.c_str(),NULL);
 
-	std::stringstream ss;
-	float trunc_float = roundf(value * 1000) / 1000;
-	ss << trunc_float;
+	// DRAW VALUE TEXT - ADAPT FLOAT PRECISION TO FADE WIDTH
 
+	std::stringstream ss;
+	
+	if (w > 30)
+	{
+		float trunc_float = roundf(value * 1000) / 1000;
+		ss << trunc_float;
+	}
+	else
+	{
+		float trunc_float = roundf(value * 100) / 100;
+		ss << trunc_float;
+	}
+	
 	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_BOTTOM);
 	text_width = (font_size/1.75) * ss.str().length();
 	nvgText(vg, x + ((w / 2) - (text_width / 2)), y + h, ss.str().c_str(), NULL);

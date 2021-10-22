@@ -462,9 +462,9 @@ int deliriumUI::main_loop()
 				if (window_resized)
 				{
 					window_resized = false;
-					window_width = window_resized_width;
-					window_height = window_resized_height;
-					glViewport( 0, 0, window_width, window_height);
+					//window_width = window_resized_width;
+					//window_height = window_resized_height;
+					// glViewport( 0, 0, window_width, window_height);
 					recalc_widget_dimensions(current_window);
 					windows[current_window].window_resized = true;
 				}

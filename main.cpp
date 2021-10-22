@@ -14,7 +14,7 @@ int main()
 
 	deliriumUI main_gui;
 
-	int win = main_gui.create_window(0, 30, main_gui.screen_width/1.1, main_gui.screen_height/1.1, "Hertz (A Digital Audio Workstation) - ThunderOx Software 2021");
+	int win = main_gui.create_window(0, 30, main_gui.screen_width, main_gui.screen_height, "Hertz (A Digital Audio Workstation) - ThunderOx Software 2021");
 	main_gui.set_current_window(win);
 	main_gui.set_window_grid(win, 64, 48);
 
@@ -74,7 +74,7 @@ int main()
 		int track_title_button = main_gui.create_widget(widget_type_button, win, track_x_pos, 1, 3, 1, my_song.get_track_name(trk));
 		main_gui.set_widget_parent(win, track_title_button, panel_mixer);
 		
-		int fader_widget_number = main_gui.create_widget(widget_type_fader, win,track_x_pos, 2.25, 1.5, 8, ss.str());
+		int fader_widget_number = main_gui.create_widget(widget_type_fader, win,track_x_pos, 2.25, 1, 8, ss.str());
 		main_gui.windows[win].widgets[fader_widget_number]->set_value(0.5);
 		main_gui.windows[win].widgets[fader_widget_number]->set_default_value(0.5);
 		main_gui.set_widget_parent(win, fader_widget_number, panel_mixer);

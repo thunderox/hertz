@@ -10,8 +10,9 @@
 void widget_knob::draw(NVGcontext* vg)
 {
 
-
+	// DRAW MAIN BODY CIRCLE
 	
+	nvgStrokeWidth(vg, 1);
 	nvgBeginPath(vg);
 
 	int ccf1 = (w+h)/8;
@@ -27,6 +28,8 @@ void widget_knob::draw(NVGcontext* vg)
 	float cos_x, sin_y, cos_x2, sin_y2;
 	ccf1 = (w+h)/7;
 	ccf2 = (w+h)/5.5;
+	
+	// DRAW RADIAL LINES AT EDGE OF KNOB
 	
 	nvgBeginPath(vg);
 	nvgStrokeColor(vg, nvgRGBA(100,100,100,200));
@@ -56,7 +59,10 @@ void widget_knob::draw(NVGcontext* vg)
 	} 
 	nvgStroke(vg);
 	
+	// DRAW MAIN LINE MARKER TO SHOW VALUE POSITION
+	
 	nvgBeginPath(vg);
+	nvgStrokeWidth(vg, 2);
 	nvgStrokeColor(vg, nvgRGBA(255,255,255,160));
 	float scale = value+0.05;
 
@@ -72,6 +78,9 @@ void widget_knob::draw(NVGcontext* vg)
 	nvgLineTo(vg,  x + (w/2) + cos_x2,  sin_y2 + cy);
 	nvgStroke(vg);
 
+	// DRAW LABEL TEXT
+	
+	nvgStrokeWidth(vg, 1);		
 	nvgBeginPath(vg);
 	float font_size = 10.0f;
 	nvgFontSize(vg, font_size);
@@ -82,6 +91,8 @@ void widget_knob::draw(NVGcontext* vg)
 	float text_width = (font_size/1.75) * text_top.length();
 	nvgText(vg, x + ((w / 2) - (text_width / 2)), y, text_top.c_str(),NULL);
 	
+	// DRAW VALUE TEXT
+	
 	std::stringstream ss;
 	float trunc_float = roundf(value * 1000) / 1000;
 	ss << trunc_float;
@@ -89,6 +100,7 @@ void widget_knob::draw(NVGcontext* vg)
 	nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_BOTTOM);
 	text_width = (font_size/1.75) * ss.str().length();
 	nvgText(vg, x + ((w / 2) - (text_width / 2)), y + h, ss.str().c_str(), NULL);
+
 	
 }
 
