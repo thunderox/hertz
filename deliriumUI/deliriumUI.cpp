@@ -92,7 +92,7 @@ deliriumUI::deliriumUI()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL 
-	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_MAXIMIZED, GL_FALSE);
 
 	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
@@ -465,7 +465,7 @@ int deliriumUI::main_loop()
 					//window_width = window_resized_width;
 					//window_height = window_resized_height;
 					// glViewport( 0, 0, window_width, window_height);
-					recalc_widget_dimensions(current_window);
+					//recalc_widget_dimensions(current_window);
 					windows[current_window].window_resized = true;
 				}
 
