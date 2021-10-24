@@ -104,8 +104,8 @@ class song
 	vector <track> tracks;
 	vector <block> blocks;
 	
-	int window_width;
-	int window_height;
+	int screen_width;
+	int screen_height;
 	
 	int play_head;
 	int track_scroll_y;

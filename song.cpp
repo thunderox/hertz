@@ -104,6 +104,8 @@ void song::draw_track_display(NVGcontext* vg, int track_number)
 	int w = tracks[track_number].w;
 	int h = tracks[track_number].h;
 
+	nvgScissor(vg, x, y, w, h);
+
 	nvgBeginPath(vg);
 	nvgFillPaint(vg, nvgLinearGradient(vg, x,y,x+w,y, nvgRGBA(50,50,80,255),nvgRGBA(30,30,50,255))); 
 	nvgRect(vg, x,y,w,h);	
@@ -202,6 +204,8 @@ void song::draw_track_display(NVGcontext* vg, int track_number)
 	}
 	
 	nvgStroke(vg);
+
+	nvgScissor(vg, 0, 0, screen_width, screen_height);
 }
 
 
