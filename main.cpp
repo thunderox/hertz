@@ -104,6 +104,8 @@ int main()
 	
 	float old_time = 0;
 
+	main_gui.recalc_widget_dimensions(current_window);
+
 	nvgBeginFrame(vg, main_gui.screen_width, main_gui.screen_height, main_gui.pxRatio);
 	main_gui.display_all();
 	

@@ -18,15 +18,19 @@ int window_resized_height;
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-    if (button == GLFW_MOUSE_BUTTON_LEFT) mouse_left_button = true;
-    	else mouse_left_button = false;
+	if (button == GLFW_MOUSE_BUTTON_LEFT) mouse_left_button = true;
+	
     	
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == 0) mouse_middle_button_pressed = true;
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == 0)
+	{
+		mouse_left_released = true;
+		mouse_left_button = false;
+	}
     
-        if (button == GLFW_MOUSE_BUTTON_MIDDLE) mouse_middle_button_pressed = true;
-    	else mouse_middle_button_pressed = false;
+	if (button == GLFW_MOUSE_BUTTON_MIDDLE) mouse_middle_button_pressed = true;
+		else mouse_middle_button_pressed = false;
     	
-    if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == 0) mouse_middle_button_released = true;
+	if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == 0) mouse_middle_button_released = true;
 }
 
 //----------------------------------------------------------------------------------------------
@@ -187,8 +191,6 @@ void deliriumUI::set_window_grid(int win, int gridx, int gridy)
 	
 		windows[win].snapx = window_width / gridx;
 		windows[win].snapy = window_height / gridy;
-		
-		cout << windows[win].snapx << " - " << windows[win].snapy << endl;
 	}
 }
 
@@ -303,8 +305,8 @@ void deliriumUI::recalc_widget_dimensions(int win)
 {
 	if (win < 0 || win > windows.size()) return;
 	
-	// windows[win].snapx = (float)window_width / (float)windows[win].gridx;
-	// windows[win].snapy = ((float)window_height+64) / (float)windows[win].gridy;
+	windows[win].snapx = (float)window_width / (float)windows[win].gridx;
+	windows[win].snapy = ((float)window_height) / (float)windows[win].gridy;
 	
 	cout << windows[win].snapx << " - " << windows[win].snapy << endl;
 	
@@ -476,8 +478,11 @@ int deliriumUI::main_loop()
 			
 				if (current_widget > -1 && windows[current_window].widgets[current_widget]->hover)
 				{
+				
 					if ( mouse_left_released && windows[current_window].widgets[current_widget]->type != widget_type_switch)
+					{
 						mouse_left_released = false;
+					}
 				
 					if ( mouse_left_released && windows[current_window].widgets[current_widget]->type == widget_type_switch)
 					{
